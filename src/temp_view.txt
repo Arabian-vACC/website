@@ -1,0 +1,687 @@
+import { useEffect, useRef, useMemo, useState } from 'react';
+// import Globe from 'react-globe.gl';
+import { motion, useScroll, useTransform } from 'framer-motion';
+// import * as THREE from 'three';
+import './App.css';
+
+const TARGET_ICAOS = [
+  'OMAA',
+  'OMAL',
+  'OMAD',
+  'OMDW',
+  'OMDL',
+  'OTBD',
+  'OTHH',
+  'OMDB',
+  'OMFJ',
+  'OOMS',
+  'OMRK',
+  'OOSA',
+  'OMSJ'
+];
+
+const formatTime = (date) => {
+  if (!date) return '—';
+  return date.toLocaleTimeString('en-GB', {
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: false,
+    timeZone: 'UTC'
+  }) + 'z';
+};
+
+const formatEventRange = (start, end) => {
+  if (!start || !end) return 'Date TBC';
+  const startDate = new Date(start);
+  const endDate = new Date(end);
+  const sameDay =
+    startDate.getUTCFullYear() === endDate.getUTCFullYear() &&
+    startDate.getUTCMonth() === endDate.getUTCMonth() &&
+    startDate.getUTCDate() === endDate.getUTCDate();
+
+  const dateFormatter = new Intl.DateTimeFormat('en-GB', {
+    timeZone: 'UTC',
+    day: '2-digit',
+    month: 'short',
+    year: 'numeric'
+  });
+
+  const timeFormatter = new Intl.DateTimeFormat('en-GB', {
+    timeZone: 'UTC',
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: false
+  });
+
+  if (sameDay) {
+    return `${dateFormatter.format(startDate)} • ${timeFormatter.format(startDate)} - ${timeFormatter.format(endDate)}z`;
+  }
+
+  return `${dateFormatter.format(startDate)} ${timeFormatter.format(startDate)}z → ${dateFormatter.format(endDate)} ${timeFormatter.format(endDate)}z`;
+};
+
+const normalizeDate = (value, fallback) => {
+  if (!value) return fallback;
+  const iso = value.includes('T') ? value : value.replace(' ', 'T');
+  const parsed = new Date(iso.endsWith('Z') ? iso : `${iso}Z`);
+  if (Number.isNaN(parsed)) return fallback;
+  return parsed;
+};
+
+function App() {
+  const globeEl = useRef();
+  const containerRef = useRef();
+  const [liveAtc, setLiveAtc] = useState([]);
+  const [bookings, setBookings] = useState([]);
+  const [events, setEvents] = useState([]);
+  const [loading, setLoading] = useState({
+    liveAtc: true,
+    bookings: true,
+    events: true
+  });
+  const pageLoadTime = useMemo(() => new Date(), []);
+
+  const { scrollYProgress } = useScroll({
+    target: containerRef,
+    offset: ["start start", "end end"]
+  });
+
+  // Smooth morph transitions for text sections
+  const section1Opacity = useTransform(scrollYProgress, [0, 0.25, 0.4], [1, 1, 0]);
+  const section1Scale = useTransform(scrollYProgress, [0, 0.4], [1, 0.95]);
+  const section1Y = useTransform(scrollYProgress, [0, 0.4], [0, -20]);
+  const section1Blur = useTransform(scrollYProgress, [0.25, 0.4], [0, 10]);
+
+  const section2Opacity = useTransform(scrollYProgress, [0.25, 0.4, 0.6], [0, 1, 0]);
+  const section2Scale = useTransform(scrollYProgress, [0.25, 0.4], [1.05, 1]);
+  const section2Y = useTransform(scrollYProgress, [0.25, 0.4], [20, 0]);
+  const section2Blur = useTransform(scrollYProgress, [0.25, 0.4], [10, 0]);
+
+  // Hide globe and text when entering ATC section
+  const heroOpacity = useTransform(scrollYProgress, [0.5, 0.65], [1, 0]);
+
+  // Generate uniform dots representing continents
+  // const dotsData = useMemo(() => {
+  //   const dots = [];
+
+  //   // Define continent boundaries (simplified)
+  //   const continents = [
+  //     // Africa
+  //     { latMin: -35, latMax: 37, lngMin: -18, lngMax: 52 },
+  //     // Europe
+  //     { latMin: 36, latMax: 71, lngMin: -10, lngMax: 40 },
+  //     // Asia
+  //     { latMin: 5, latMax: 75, lngMin: 40, lngMax: 150 },
+  //     // North America
+  //     { latMin: 15, latMax: 72, lngMin: -168, lngMax: -52 },
+  //     // South America
+  //     { latMin: -56, latMax: 12, lngMin: -81, lngMax: -35 },
+  //     // Australia
+  //     { latMin: -45, latMax: -10, lngMin: 113, lngMax: 154 },
+  //   ];
+
+  //   const latStep = 2.5;
+  //   const lngStep = 2.5;
+
+  //   continents.forEach(continent => {
+  //     for (let lat = continent.latMin; lat <= continent.latMax; lat += latStep) {
+  //       for (let lng = continent.lngMin; lng <= continent.lngMax; lng += lngStep) {
+  //         dots.push({
+  //           lat,
+  //           lng,
+  //           size: 0.3,
+  //           color: '#6496ff'
+  //         });
+  //       }
+  //     }
+  //   });
+
+  //   return dots;
+  // }, []);
+
+  // useEffect(() => {
+  //   if (globeEl.current) {
+  //     // Position camera to view UAE from above
+  //     globeEl.current.pointOfView({
+  //       lat: 24.4539,
+  //       lng: 54.3773,
+  //       altitude: 2.5
+  //     }, 0);
+
+  //     // Auto-rotate the globe slowly
+  //     globeEl.current.controls().autoRotate = true;
+  //     globeEl.current.controls().autoRotateSpeed = 0.15;
+
+  //     // Disable zoom
+  //     globeEl.current.controls().enableZoom = false;
+  //     globeEl.current.controls().minDistance = 450;
+  //     globeEl.current.controls().maxDistance = 450;
+
+  //     // Disable all interactions to prevent interference
+  //     globeEl.current.controls().enabled = false;
+  //   }
+  // }, []);
+
+  useEffect(() => {
+    const controller = new AbortController();
+    const loadLiveAtc = async () => {
+      try {
+        const res = await fetch('https://api.vatsim.net/v2/atc/online', { signal: controller.signal });
+        if (!res.ok) throw new Error(`Live ATC request failed (${res.status})`);
+        const data = await res.json();
+        const filtered = data
+          .filter(item => TARGET_ICAOS.some(code => item.callsign?.startsWith(code)))
+          .map(item => ({
+            id: item.id,
+            callsign: item.callsign,
+            rating: typeof item.rating === 'number' ? item.rating : '—',
+            start: normalizeDate(item.start, pageLoadTime)
+          }))
+          .sort((a, b) => (b.start || 0) - (a.start || 0));
+        setLiveAtc(filtered);
+      } catch (err) {
+        console.error(err);
+      } finally {
+        setLoading(prev => ({ ...prev, liveAtc: false }));
+      }
+    };
+
+    loadLiveAtc();
+    return () => controller.abort();
+  }, [pageLoadTime]);
+
+  useEffect(() => {
+    const controller = new AbortController();
+    const loadBookings = async () => {
+      try {
+        const res = await fetch('https://atc-bookings.vatsim.net/api/booking?division=MENA&subdivision=ARB', { signal: controller.signal });
+        if (!res.ok) throw new Error(`Bookings request failed (${res.status})`);
+        const data = await res.json();
+        const filtered = data
+          .filter(item => TARGET_ICAOS.some(code => item.callsign?.startsWith(code)))
+          .map(item => ({
+            id: item.id,
+            callsign: item.callsign,
+            start: normalizeDate(item.start, null),
+            end: normalizeDate(item.end, null)
+          }))
+          .sort((a, b) => (a.start || 0) - (b.start || 0));
+        setBookings(filtered);
+      } catch (err) {
+        console.error(err);
+      } finally {
+        setLoading(prev => ({ ...prev, bookings: false }));
+      }
+    };
+
+    loadBookings();
+    return () => controller.abort();
+  }, []);
+
+  useEffect(() => {
+    const controller = new AbortController();
+    const loadEvents = async () => {
+      try {
+        const res = await fetch('https://my.vatsim.net/api/v2/events/view/division/MENA', { signal: controller.signal });
+        if (!res.ok) throw new Error(`Events request failed (${res.status})`);
+        const { data } = await res.json();
+        const filtered = data
+          .filter(event =>
+            event.airports?.some(airport => TARGET_ICAOS.includes(airport.icao))
+          )
+          .map(event => ({
+            id: event.id,
+            name: event.name,
+            start: event.start_time,
+            end: event.end_time,
+            banner: event.banner,
+            airports: event.airports?.map(a => a.icao).join(', ')
+          }))
+          .sort((a, b) => new Date(a.start) - new Date(b.start));
+        setEvents(filtered);
+      } catch (err) {
+        console.error(err);
+      } finally {
+        setLoading(prev => ({ ...prev, events: false }));
+      }
+    };
+
+    loadEvents();
+    return () => controller.abort();
+  }, []);
+
+  const groupedBookings = useMemo(() => {
+    const groups = bookings.reduce((acc, booking) => {
+      const startDate = booking.start || pageLoadTime;
+      const key = startDate.toISOString().split('T')[0];
+      if (!acc[key]) acc[key] = [];
+      acc[key].push(booking);
+      return acc;
+    }, {});
+
+    return Object.entries(groups)
+      .map(([date, items]) => ({
+        date,
+        items: items.sort((a, b) => (a.start || 0) - (b.start || 0))
+      }))
+      .sort((a, b) => new Date(a.date) - new Date(b.date));
+  }, [bookings, pageLoadTime]);
+
+  return (
+    <div className="app" ref={containerRef}>
+      {/* Logo Navigation */}
+      <div className="logo-nav">
+        <div className="logo-container">
+          <img src="/logo.png" alt="Arabian vACC Logo" className="logo-image" />
+          <div className="nav-dropdown">
+            <a href="#home" className="nav-item">Home</a>
+            <a href="#staff" className="nav-item">Staff</a>
+            <a href="#documentation" className="nav-item">Documentation</a>
+            <a href="#controllers" className="nav-item">Controllers</a>
+          </div>
+        </div>
+      </div>
+
+      {/* Fixed Globe on Right */}
+      {/* <motion.div className="globe-fixed" style={{ opacity: heroOpacity }}>
+        <div className="globe-container">
+          <Globe
+            ref={globeEl}
+            backgroundColor="rgba(0,0,0,0)"
+            globeMaterial={new THREE.MeshBasicMaterial({
+              color: '#1a2942',
+              transparent: true,
+              opacity: 0.95
+            })}
+            showAtmosphere={true}
+            atmosphereColor="#4a6fa5"
+            atmosphereAltitude={0.1}
+            pointsData={dotsData}
+            pointLat="lat"
+            pointLng="lng"
+            pointColor="color"
+            pointAltitude={0.01}
+            pointRadius="size"
+          />
+        </div>
+      </motion.div> */}
+
+      {/* Scrollable Text Sections on Left */}
+      <motion.div className="text-sections" style={{ opacity: heroOpacity }}>
+        {/* Section 1 */}
+        <div className="text-section">
+          <motion.div
+            style={{
+              opacity: section1Opacity,
+              scale: section1Scale,
+              y: section1Y,
+              filter: section1Blur
+            }}
+          >
+            <h1 className="welcome-title">
+              <span className="line-1">Welcome to the</span>
+              <span className="accent">Arabian vACC.</span>
+            </h1>
+          </motion.div>
+        </div>
+
+        {/* Section 2 */}
+        <div className="text-section">
+          <motion.div
+            style={{
+              opacity: section2Opacity,
+              scale: section2Scale,
+              y: section2Y,
+              filter: section2Blur
+            }}
+          >
+            <h1 className="welcome-title">
+              <span className="line-1">The <span className="accent-inline">leading</span> vACC on</span>
+              <span className="line-2">the VATSIM Network.</span>
+            </h1>
+          </motion.div>
+        </div>
+      </motion.div>
+
+      {/* Scroll Indicator */}
+      <motion.div
+        className="scroll-indicator"
+        style={{ opacity: heroOpacity }}
+      >
+        <p>Scroll down to learn more</p>
+        <div className="scroll-arrow">↓</div>
+      </motion.div>
+
+      {/* Third Section - ATC & Events */}
+      <section className="atc-section">
+        <div className="atc-container">
+          {/* Left Side - Events Grid */}
+          <div className="left-content">
+            <div className="events-grid">
+              <div className="event-card">
+                <div className="event-banner" style={{ background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' }}></div>
+                <div className="event-overlay">
+                  <h3 className="event-name">Dubai FlyIn</h3>
+                  <p className="event-date">Oct 15, 2025</p>
+                </div>
+              </div>
+              <div className="event-card">
+                <div className="event-banner" style={{ background: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)' }}></div>
+                <div className="event-overlay">
+                  <h3 className="event-name">Abu Dhabi Grand Prix</h3>
+                  <p className="event-date">Oct 22, 2025</p>
+                </div>
+              </div>
+              <div className="event-card">
+                <div className="event-banner" style={{ background: 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)' }}></div>
+                <div className="event-overlay">
+                  <h3 className="event-name">Cross the Pond</h3>
+                  <p className="event-date">Nov 5, 2025</p>
+                </div>
+              </div>
+              <div className="event-card">
+                <div className="event-banner" style={{ background: 'linear-gradient(135deg, #fa709a 0%, #fee140 100%)' }}></div>
+                <div className="event-overlay">
+                  <h3 className="event-name">World Tour Event</h3>
+                  <p className="event-date">Nov 18, 2025</p>
+                </div>
+              </div>
+            </div>
+            <div className="view-all-container">
+              <a href="#" className="view-all-link">
+                See more <span className="arrow">→</span>
+              </a>
+            </div>
+
+            {/* Latest Announcements */}
+            <div className="announcements-section">
+              <h2 className="section-heading">Latest Announcements</h2>
+              <div className="announcements-list">
+                <div className="announcement-card">
+                  <div className="announcement-date">Oct 5, 2025</div>
+                  <h3 className="announcement-title">New Training Program Launch</h3>
+                  <p className="announcement-excerpt">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam vulputate sit amet nulla vitae rutrum...</p>
+                </div>
+                <div className="announcement-card">
+                  <div className="announcement-date">Oct 3, 2025</div>
+                  <h3 className="announcement-title">System Maintenance Scheduled</h3>
+                  <p className="announcement-excerpt">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam vulputate sit amet nulla vitae rutrum...</p>
+                </div>
+                <div className="announcement-card">
+                  <div className="announcement-date">Sep 30, 2025</div>
+                  <h3 className="announcement-title">September</h3>
+                  <p className="announcement-excerpt">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nam vulputate sit amet nulla vitae rutrum...</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Right Side - ATC Bookings & Live ATC */}
+          <div className="right-content">
+            <div className="atc-combined-card">
+              {/* Live ATC */}
+              <div className="atc-section-inner">
+                <h2 className="section-heading">Live ATC</h2>
+                <div className="atc-list">
+                  <div className="live-atc-item">
+                    <div className="atc-position-container">
+                      <span className="atc-position-slim" title="CID: 1234567">OMDB_TWR</span>
+                      <span className="atc-tag atc-tag-event">Event</span>
+                    </div>
+                    <span className="atc-time">1430z</span>
+                  </div>
+                  <div className="live-atc-item">
+                    <div className="atc-position-container">
+                      <span className="atc-position-slim" title="CID: 7654321">OMAA_GND</span>
+                    </div>
+                    <span className="atc-time">1615z</span>
+                  </div>
+                  <div className="live-atc-item">
+                    <div className="atc-position-container">
+                      <span className="atc-position-slim" title="CID: 9876543">OMSJ_APP</span>
+                      <span className="atc-tag atc-tag-training">Training</span>
+                    </div>
+                    <span className="atc-time">1500z</span>
+                  </div>
+                  <div className="live-atc-item">
+                    <div className="atc-position-container">
+                      <span className="atc-position-slim" title="CID: 1122334">OMDB_GND</span>
+                    </div>
+                    <span className="atc-time">1345z</span>
+                  </div>
+                  <div className="live-atc-item">
+                    <div className="atc-position-container">
+                      <span className="atc-position-slim" title="CID: 5566778">OMAD_APP</span>
+                      <span className="atc-tag atc-tag-exam">Exam</span>
+                    </div>
+                    <span className="atc-time">1520z</span>
+                  </div>
+                  <div className="live-atc-item">
+                    <div className="atc-position-container">
+                      <span className="atc-position-slim" title="CID: 9988776">OERK_TWR</span>
+                    </div>
+                    <span className="atc-time">1400z</span>
+                  </div>
+                  <div className="live-atc-item">
+                    <div className="atc-position-container">
+                      <span className="atc-position-slim" title="CID: 3344556">OEJN_CTR</span>
+                    </div>
+                    <span className="atc-time">1245z</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* ATC Bookings */}
+              <div className="atc-section-inner">
+                <h2 className="section-heading">ATC Bookings</h2>
+                <div className="atc-list">
+                  <div className="booking-group">
+                    <div className="booking-date-header booking-date-header-first">
+                      <span className="booking-date">Tue, Oct 8</span>
+                      <span className="booking-time-label">Start Time</span>
+                      <span className="booking-time-label">End Time</span>
+                    </div>
+                    <div className="booking-item-slim">
+                      <span className="booking-position-slim">OMDB_TWR</span>
+                      <span className="booking-start">14:00z</span>
+                      <span className="booking-end">18:00z</span>
+                    </div>
+                    <div className="booking-item-slim">
+                      <span className="booking-position-slim">OMAA_APP</span>
+                      <span className="booking-start">16:00z</span>
+                      <span className="booking-end">20:00z</span>
+                    </div>
+                    <div className="booking-item-slim">
+                      <span className="booking-position-slim">OEJN_CTR</span>
+                      <span className="booking-start">12:00z</span>
+                      <span className="booking-end">16:00z</span>
+                    </div>
+                  </div>
+                  <div className="booking-group">
+                    <div className="booking-date-header">Wed, Oct 9</div>
+                    <div className="booking-item-slim">
+                      <span className="booking-position-slim">OMSJ_CTR</span>
+                      <span className="booking-start">10:00z</span>
+                      <span className="booking-end">14:00z</span>
+                    </div>
+                    <div className="booking-item-slim">
+                      <span className="booking-position-slim">OMDB_GND</span>
+                      <span className="booking-start">15:00z</span>
+                      <span className="booking-end"></span>
+                    </div>
+                  </div>
+                  <div className="booking-group">
+                    <div className="booking-date-header">Thu, Oct 10</div>
+                    <div className="booking-item-slim">
+                      <span className="booking-position-slim">OMDB_GND</span>
+                      <span className="booking-start">12:00z</span>
+                      <span className="booking-end">15:00z</span>
+                    </div>
+                    <div className="booking-item-slim">
+                      <span className="booking-position-slim">OERK_TWR</span>
+                      <span className="booking-start">18:00z</span>
+                      <span className="booking-end">22:00z</span>
+                    </div>
+                  </div>
+                  <div className="booking-group">
+                    <div className="booking-date-header">Fri, Oct 11</div>
+                    <div className="booking-item-slim">
+                      <span className="booking-position-slim">OMAA_TWR</span>
+                      <span className="booking-start">14:00z</span>
+                      <span className="booking-end">18:00z</span>
+                    </div>
+                    <div className="booking-item-slim">
+                      <span className="booking-position-slim">OMDB_APP</span>
+                      <span className="booking-start">16:00z</span>
+                      <span className="booking-end">20:00z</span>
+                    </div>
+                    <div className="booking-item-slim">
+                      <span className="booking-position-slim">OEJN_FSS</span>
+                      <span className="booking-start">08:00z</span>
+                      <span className="booking-end">12:00z</span>
+                    </div>
+                  </div>
+                  <div className="booking-group">
+                    <div className="booking-date-header">Sat, Oct 12</div>
+                    <div className="booking-item-slim">
+                      <span className="booking-position-slim">OMDB_TWR</span>
+                      <span className="booking-start">10:00z</span>
+                      <span className="booking-end">14:00z</span>
+                    </div>
+                    <div className="booking-item-slim">
+                      <span className="booking-position-slim">OMAA_GND</span>
+                      <span className="booking-start">12:00z</span>
+                      <span className="booking-end">16:00z</span>
+                    </div>
+                  </div>
+                  <div className="booking-group">
+                    <div className="booking-date-header">Sun, Oct 13</div>
+                    <div className="booking-item-slim">
+                      <span className="booking-position-slim">OMSJ_APP</span>
+                      <span className="booking-start">15:00z</span>
+                      <span className="booking-end">19:00z</span>
+                    </div>
+                    <div className="booking-item-slim">
+                      <span className="booking-position-slim">OERK_GND</span>
+                      <span className="booking-start">11:00z</span>
+                      <span className="booking-end">15:00z</span>
+                    </div>
+                    <div className="booking-item-slim">
+                      <span className="booking-position-slim">OMDB_APP</span>
+                      <span className="booking-start">17:00z</span>
+                      <span className="booking-end"></span>
+                    </div>
+                  </div>
+                  <div className="booking-group">
+                    <div className="booking-date-header">Mon, Oct 14</div>
+                    <div className="booking-item-slim">
+                      <span className="booking-position-slim">OMAA_APP</span>
+                      <span className="booking-start">13:00z</span>
+                      <span className="booking-end">17:00z</span>
+                    </div>
+                    <div className="booking-item-slim">
+                      <span className="booking-position-slim">OEJN_CTR</span>
+                      <span className="booking-start">09:00z</span>
+                      <span className="booking-end">13:00z</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Feedback Form */}
+            <div className="feedback-form-container">
+              <h2 className="section-heading">Submit Feedback</h2>
+              <form className="feedback-form">
+                <div className="form-row">
+                  <div className="form-group">
+                    <label htmlFor="cid">CID</label>
+                    <input type="text" id="cid" placeholder="Enter your CID" />
+                  </div>
+                  <div className="form-group">
+                    <label htmlFor="position">Position</label>
+                    <input type="text" id="position" placeholder="e.g., OMDB_TWR" />
+                  </div>
+                </div>
+                <div className="form-group">
+                  <label htmlFor="feedback-type">Feedback Type</label>
+                  <select id="feedback-type">
+                    <option value="">Select type</option>
+                    <option value="positive">Positive</option>
+                    <option value="negative">Negative</option>
+                  </select>
+                </div>
+                <div className="form-group">
+                  <label htmlFor="description">Description</label>
+                  <textarea id="description" rows="5" placeholder="Enter your feedback..."></textarea>
+                </div>
+                <button type="submit" className="submit-button">Submit Feedback</button>
+              </form>
+            </div>
+          </div>
+        </div>
+
+        {/* Partners Section */}
+        <div className="partners-section">
+          <h2 className="section-heading-center">Our Partners</h2>
+          <div className="partners-grid">
+            <div className="partner-logo">
+              <div className="partner-placeholder">Partner 1</div>
+            </div>
+            <div className="partner-logo">
+              <div className="partner-placeholder">Partner 2</div>
+            </div>
+            <div className="partner-logo">
+              <div className="partner-placeholder">Partner 3</div>
+            </div>
+            <div className="partner-logo">
+              <div className="partner-placeholder">Partner 4</div>
+            </div>
+            <div className="partner-logo">
+              <div className="partner-placeholder">Partner 5</div>
+            </div>
+            <div className="partner-logo">
+              <div className="partner-placeholder">Partner 6</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Footer */}
+      <footer className="footer">
+        <div className="footer-content">
+          <div className="footer-section">
+            <h3>Arabian vACC</h3>
+            <p>Copyright © 2025 Arabian vACC</p>
+          </div>
+          <div className="footer-section">
+            <h4>Pilots</h4>
+            <a href="#airports">Airports & Charts</a>
+            <a href="#pilot-resource">Pilot Resource Center</a>
+            <a href="#virtual-airlines">Virtual Airlines</a>
+          </div>
+          <div className="footer-section">
+            <h4>Controllers</h4>
+            <a href="#become-controller">Become a Controller</a>
+            <a href="#library">Library</a>
+            <a href="#hq">HQ</a>
+            <a href="#atc-roster">ATC Roster</a>
+            <a href="#atc-feedback">ATC Feedback</a>
+          </div>
+          <div className="footer-section">
+            <h4>Community</h4>
+            <a href="#github">GitHub</a>
+            <a href="#instagram">Instagram</a>
+            <a href="#twitter">Twitter</a>
+            <a href="#facebook">Facebook</a>
+            <a href="#discord">Discord</a>
+            <a href="#twitch">Twitch</a>
+          </div>
+        </div>
+      </footer>
+    </div>
+  );
+}
+
+export default App;
+
