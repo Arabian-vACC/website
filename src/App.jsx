@@ -228,10 +228,8 @@ function App() {
         <div className="logo-container">
           <img src="/logo.png" alt="Arabian vACC Logo" className="logo-image" />
           <div className="nav-dropdown">
-            <a href="#home" className="nav-item">Home</a>
-            <a href="#staff" className="nav-item">Staff</a>
-            <a href="#documentation" className="nav-item">Documentation</a>
-            <a href="#controllers" className="nav-item">Controllers</a>
+            <a href="https://arabianvacc.com" className="nav-item">Home</a>
+            <a href="https://library.arabianvacc.com" className="nav-item">Library</a>
           </div>
         </div>
       </div>
