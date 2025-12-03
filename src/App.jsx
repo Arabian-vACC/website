@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState, useRef } from 'react';
+﻿import { useEffect, useMemo, useState, useRef } from 'react';
 import { motion, useScroll, useTransform } from 'framer-motion';
 import './App.css';
 
@@ -19,7 +19,7 @@ const TARGET_ICAOS = [
 ];
 
 const formatTime = (date) => {
-  if (!date) return '—';
+  if (!date) return '\u2014';
   return date.toLocaleTimeString('en-GB', {
     hour: '2-digit',
     minute: '2-digit',
@@ -52,10 +52,10 @@ const formatEventRange = (start, end) => {
   });
 
   if (sameDay) {
-    return `${dateFormatter.format(startDate)} • ${timeFormatter.format(startDate)}z - ${timeFormatter.format(endDate)}z`;
+    return `${dateFormatter.format(startDate)} \u2022 ${timeFormatter.format(startDate)}z - ${timeFormatter.format(endDate)}z`;
   }
 
-  return `${dateFormatter.format(startDate)} ${timeFormatter.format(startDate)}z → ${dateFormatter.format(endDate)} ${timeFormatter.format(endDate)}z`;
+  return `${dateFormatter.format(startDate)} ${timeFormatter.format(startDate)}z \u2192 ${dateFormatter.format(endDate)} ${timeFormatter.format(endDate)}z`;
 };
 
 const normalizeDate = (value, fallback) => {
@@ -65,6 +65,110 @@ const normalizeDate = (value, fallback) => {
   if (Number.isNaN(parsed)) return fallback;
   return parsed;
 };
+
+const staff = [
+  {
+    cid: 1306415,
+    code: "ACCARB1",
+    title: "vACC Director",
+    name: "Chriss Klosowski",
+    email: "director@arabianvacc.com",
+  },
+  {
+    cid: 1648952,
+    code: "ACCARB2",
+    title: "vACC Deputy Director",
+    name: "Abdulrahman Alamoodi",
+    email: "director@arabianvacc.com",
+  },
+  {
+    cid: 1351391,
+    code: "ACCARB3",
+    title: "ATC Training Department Director",
+    name: "Suprojit Paul",
+    email: "training@arabianvacc.com",
+  },
+  {
+    cid: 1426067,
+    code: "ACCARB31",
+    title: "ATC Training Department Deputy Director",
+    name: "Shahzin Shajid",
+    email: "training@arabianvacc.com",
+  },
+  {
+    cid: 1879692,
+    code: "ACCARB4",
+    title: "ATC Operations Department Director",
+    name: "Kier",
+    email: "operations@arabianvacc.com",
+  },
+  {
+    cid: 1294355,
+    code: "ACCARB44",
+    title: "U.A.E FIR Director",
+    name: "Bogan",
+    email: "bogan@arabianvacc.com",
+  },
+  {
+    cid: 1891257,
+    code: "ACCARB5",
+    title: "Marketing Department Director",
+    name: "Will",
+    email: "marketing@arabianvacc.com",
+  },
+  {
+    cid: 1707224,
+    code: "ACCARB6",
+    title: "Membership Department Director",
+    name: "Ian Bijil",
+    email: "membership@arabianvacc.com",
+  },
+  {
+    cid: 1528029,
+    code: "ACCARB7",
+    title: "Technical Director",
+    name: "Thayyeb Ikraam",
+    email: "technical@arabianvacc.com"
+  },
+  {
+    cid: 1306415,
+    code: "ARBDPO",
+    title: "Data Protection Officer",
+    name: "Chriss Klosowski",
+    email: "chriss.klosowski@vatsim.me",
+  },
+];
+
+const vacancies = [
+  {
+    cid: '\u2014',
+    code: 'ACCARB41',
+    title: 'ATC Operations Department Deputy Director',
+    name: 'Vacant - Open',
+    email: 'N/A'
+  },
+  {
+    cid: '\u2014',
+    code: 'ACCARB42',
+    title: 'Doha FIR Director',
+    name: 'Vacant - Open',
+    email: 'N/A'
+  },
+  {
+    cid: '\u2014',
+    code: 'ACCARB43',
+    title: 'Muscat FIR Director',
+    name: 'Vacant - Open',
+    email: 'N/A'
+  },
+  {
+    cid: '\u2014',
+    code: 'ACCARB51',
+    title: 'Marketing Department Deputy Director',
+    name: 'Vacant - Open',
+    email: 'N/A'
+  }
+];
 
 function App() {
   const partnerLogos = [
@@ -87,8 +191,10 @@ function App() {
   const pageLoadTime = useMemo(() => new Date(), []);
   const isInitialLoading = loading.liveAtc || loading.bookings || loading.events;
 
+  const isStaffPage = typeof window !== 'undefined' && window.location.pathname.toLowerCase().includes('staff');
+
   const { scrollYProgress } = useScroll({
-    target: heroRef,
+    target: isStaffPage ? undefined : heroRef,
     offset: ["start start", "end end"]
   });
 
@@ -110,18 +216,14 @@ function App() {
         const res = await fetch('/api/data', { signal: controller.signal });
         if (!res.ok) throw new Error(`Live ATC request failed (${res.status})`);
         const payload = await res.json();
-        const controllers = payload.controllers || [];
+                const controllers = payload.controllers || [];
+        const callsignMatcher = /^((OM|OT|OO)[A-Z0-9]{2,}_|DOH)/;
         const filtered = controllers
-          .filter(ctrl => (
-            (/^OM.._/.test(ctrl.callsign) ||
-             /^OT.._/.test(ctrl.callsign) ||
-             /^OO.._/.test(ctrl.callsign) ||
-             /^DOH/.test(ctrl.callsign))
-          ))
+          .filter(ctrl => callsignMatcher.test(ctrl.callsign || ''))
           .map(ctrl => ({
             id: ctrl.cid,
             callsign: ctrl.callsign,
-            rating: typeof ctrl.rating === 'number' ? ctrl.rating : '—',
+            rating: typeof ctrl.rating === 'number' ? ctrl.rating : '\u2014',
             start: normalizeDate(ctrl.logon_time, pageLoadTime)
           }))
           .sort((a, b) => (b.start || 0) - (a.start || 0));
@@ -216,6 +318,77 @@ function App() {
 
   const eventsOdd = events.length % 2 === 1;
 
+  if (isStaffPage) {
+    const visibleStaff = staff.filter(member => member.cid && member.email !== 'N/A');
+    const order = ['ACCARB1', 'ACCARB2', 'ACCARB3', 'ACCARB31', 'ACCARB4', 'ACCARB44', 'ACCARB5', 'ACCARB6', 'ACCARB7', 'ARBDPO'];
+    const orderedStaff = order
+      .map(code => visibleStaff.find(member => member.code === code))
+      .filter(Boolean);
+
+    return (
+      <div className="staff-page">
+        <header className="staff-header">
+          <div className="logo-nav">
+            <div className="logo-container">
+              <img src="/logo.png" alt="Arabian vACC Logo" className="logo-image" />
+              <div className="nav-dropdown">
+                <a href="https://arabianvacc.com" className="nav-item">Home</a>
+                <a href="/staff" className="nav-item">Staff</a>
+                <a href="https://library.arabianvacc.com" className="nav-item">Library</a>
+              </div>
+            </div>
+          </div>
+          <h1>Arabian vACC Leadership</h1>
+          <p>Meet the team behind Arabian vACC.</p>
+        </header>
+        <main className="staff-table-wrapper">
+          <table className="staff-table">
+            <thead>
+              <tr>
+                <th>Title</th>
+                <th>Name</th>
+                <th>Email</th>
+                <th>CID</th>
+              </tr>
+            </thead>
+            <tbody>
+              {orderedStaff.map(member => (
+                <tr key={member.code}>
+                  <td>
+                    <div className="staff-code">{member.code}</div>
+                    <div className="staff-title indented">{member.title}</div>
+                  </td>
+                  <td>{member.name}</td>
+                  <td><a className="staff-email" href={`mailto:${member.email}`}>{member.email}</a></td>
+                  <td>{member.cid}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+
+          <h2 className="vacancies-heading">Vacancies</h2>
+          <table className="staff-table">
+            <thead>
+              <tr>
+                <th>Position</th>
+              </tr>
+            </thead>
+            <tbody>
+              {vacancies.map(role => (
+                <tr key={role.code}>
+                  <td>
+                    <div className="staff-code">{role.code}</div>
+                    <div className="staff-title indented">{role.title}</div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </main>
+      </div>
+    );
+  }
+
   return (
     <div className="app">
       {isInitialLoading && (
@@ -229,6 +402,7 @@ function App() {
           <img src="/logo.png" alt="Arabian vACC Logo" className="logo-image" />
           <div className="nav-dropdown">
             <a href="https://arabianvacc.com" className="nav-item">Home</a>
+            <a href="/staff" className="nav-item">Staff</a>
             <a href="https://library.arabianvacc.com" className="nav-item">Library</a>
           </div>
         </div>
@@ -515,5 +689,20 @@ function App() {
 }
 
 export default App;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 

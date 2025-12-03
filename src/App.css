@@ -876,6 +876,90 @@ body {
   justify-content: center;
 }
 
+/* Staff Page */
+.staff-page {
+  min-height: 100vh;
+  background: linear-gradient(135deg, var(--darker-blue) 0%, var(--dark-blue) 100%);
+  color: var(--text-white);
+  padding: 3rem 8%;
+}
+
+.staff-header {
+  text-align: center;
+  margin-bottom: 3rem;
+}
+
+.staff-header h1 {
+  font-size: clamp(2rem, 5vw, 3rem);
+  margin-bottom: 0.5rem;
+}
+
+.staff-header p {
+  color: var(--text-gray);
+}
+
+.staff-table-wrapper {
+  overflow-x: auto;
+}
+
+.staff-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: rgba(26, 41, 66, 0.7);
+  border: 1px solid rgba(74, 111, 165, 0.2);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.staff-table th,
+.staff-table td {
+  padding: 0.85rem 1rem;
+  border-bottom: 1px solid rgba(74, 111, 165, 0.2);
+  text-align: left;
+}
+
+.staff-table thead th {
+  background: rgba(74, 111, 165, 0.2);
+  color: var(--text-white);
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+.staff-table tbody tr:nth-child(every 2) {
+  background: rgba(26, 41, 66, 0.5);
+}
+
+.staff-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.staff-code {
+  color: var(--accent-orange);
+  font-weight: 700;
+  letter-spacing: 0.05em;
+}
+
+.staff-title.indented {
+  margin-left: 0.5rem;
+}
+
+.staff-email {
+  color: var(--text-gray);
+  text-decoration: none;
+  word-break: break-all;
+}
+
+.staff-email:hover {
+  color: var(--accent-orange);
+}
+
+.vacancies-heading {
+  margin: 2rem 0 1rem;
+  color: var(--text-white);
+  font-size: 1.2rem;
+  font-weight: 700;
+}
+
 /* Footer */
 .footer {
   background: var(--darker-blue);
