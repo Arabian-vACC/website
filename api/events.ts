@@ -5,7 +5,7 @@ export const config = {
 export default async function handler(_req: unknown, res: any) {
   try {
     const response = await fetch(
-      'https://events.vatsim.net/api/events',
+      'https://my.vatsim.net/api/v2/events/latest',
       {
         headers: {
           'User-Agent': 'Arabian-vACC/1.0 (https://vatsim-arabian.com)',

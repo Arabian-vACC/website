@@ -5,7 +5,7 @@ export const config = {
 export default async function handler(_req: unknown, res: any) {
   try {
     const response = await fetch(
-      'https://atc-bookings.vatsim.net/api/bookings',
+      'https://atc-bookings.vatsim.net/api/booking',
       {
         headers: {
           'User-Agent': 'Arabian-vACC/1.0 (https://vatsim-arabian.com)',
