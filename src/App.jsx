@@ -68,82 +68,40 @@ const normalizeDate = (value, fallback) => {
 
 const staff = [
   {
-    cid: 1306415,
+    cid: 1111111,
     code: "ACCARB1",
     title: "vACC Director",
-    name: "Chriss Klosowski",
-    email: "director@arabianvacc.com",
+    name:  "RESERVED",
+    email: "board@vatsim.me",
   },
   {
     cid: 1648952,
     code: "ACCARB2",
     title: "vACC Deputy Director",
     name: "Abdulrahman Alamoodi",
-    email: "director@arabianvacc.com",
+    email: "abdulrahman.alamoodi@vatsim.me",
   },
   {
-    cid: 1351391,
-    code: "ACCARB3",
-    title: "ATC Training Department Director",
-    name: "Suprojit Paul",
-    email: "training@arabianvacc.com",
-  },
-  {
-    cid: 1426067,
-    code: "ACCARB31",
-    title: "ATC Training Department Deputy Director",
-    name: "Shahzin Shajid",
-    email: "training@arabianvacc.com",
-  },
-  {
-    cid: 1879692,
-    code: "ACCARB4",
-    title: "ATC Operations Department Director",
-    name: "Kier",
-    email: "operations@arabianvacc.com",
-  },
-  {
-    cid: 1294355,
-    code: "ACCARB44",
-    title: "U.A.E FIR Director",
-    name: "Bogan",
-    email: "bogan@arabianvacc.com",
-  },
-  {
-    cid: 1891257,
-    code: "ACCARB5",
-    title: "Marketing Department Director",
-    name: "Will",
-    email: "marketing@arabianvacc.com",
-  },
-  {
-    cid: 1707224,
-    code: "ACCARB6",
-    title: "Membership Department Director",
-    name: "Ian Bijil",
-    email: "membership@arabianvacc.com",
-  },
-  {
-    cid: 1528029,
-    code: "ACCARB7",
-    title: "Technical Director",
-    name: "Thayyeb Ikraam",
-    email: "technical@arabianvacc.com"
-  },
-  {
-    cid: 1306415,
+    cid: 1648952,
     code: "ARBDPO",
     title: "Data Protection Officer",
-    name: "Chriss Klosowski",
-    email: "chriss.klosowski@vatsim.me",
+    name: "Abdulrahman Alamoodi",
+    email: "abdulrahman.alamoodi@vatsim.me",
   },
 ];
 
 const vacancies = [
+    {
+    cid: '\u2014',
+    code: 'ACCARB3',
+    title: 'ATC Training Director',
+    name: 'Vacant - Open',
+    email: 'N/A'
+  },
   {
     cid: '\u2014',
-    code: 'ACCARB41',
-    title: 'ATC Operations Department Deputy Director',
+    code: 'ACCARB4',
+    title: 'ATC Operations Department Director',
     name: 'Vacant - Open',
     email: 'N/A'
   },
@@ -156,6 +114,13 @@ const vacancies = [
   },
   {
     cid: '\u2014',
+    code: 'ACCARB44',
+    title: 'U.A.E FIR Director',
+    name: 'Vacant - Open',
+    email: 'N/A'
+  },
+  {
+    cid: '\u2014',
     code: 'ACCARB43',
     title: 'Muscat FIR Director',
     name: 'Vacant - Open',
@@ -163,8 +128,22 @@ const vacancies = [
   },
   {
     cid: '\u2014',
-    code: 'ACCARB51',
-    title: 'Marketing Department Deputy Director',
+    code: 'ACCARB5',
+    title: 'Marketing Department Director',
+    name: 'Vacant - Open',
+    email: 'N/A'
+  },
+  {
+    cid: '\u2014',
+    code: 'ACCARB6',
+    title: 'Membership Department Director',
+    name: 'Vacant - Open',
+    email: 'N/A'
+  },
+  {
+    cid: '\u2014',
+    code: 'ACCARB7',
+    title: 'Technical Department Director',
     name: 'Vacant - Open',
     email: 'N/A'
   }
@@ -172,7 +151,6 @@ const vacancies = [
 
 function App() {
   const partnerLogos = [
-    { name: 'Emirates', file: 'emirates.png', url: 'https://ek-virtual.com', size: 'wide' },
     { name: 'Qatar', file: 'qatar.png', url: 'https://mynextairline.com/airlines/oryx-virtual', size: 'wide' },
     { name: 'VABY', file: 'vaby.png', url: 'https://abyvirtual.com/', size: 'small' },
     { name: 'iniBuilds', file: 'inibuilds.png', url: 'https://inibuilds.com/' },
@@ -332,9 +310,9 @@ function App() {
             <div className="logo-container">
               <img src="/logo.png" alt="Arabian vACC Logo" className="logo-image" />
               <div className="nav-dropdown">
-                <a href="https://arabianvacc.com" className="nav-item">Home</a>
+                <a href="https://vatsim-arabian.com" className="nav-item">Home</a>
                 <a href="/staff" className="nav-item">Staff</a>
-                <a href="https://library.arabianvacc.com" className="nav-item">Library</a>
+                <a href="https://library.vatsim-arabian.com" className="nav-item">Library</a>
               </div>
             </div>
           </div>
@@ -401,9 +379,9 @@ function App() {
         <div className="logo-container">
           <img src="/logo.png" alt="Arabian vACC Logo" className="logo-image" />
           <div className="nav-dropdown">
-            <a href="https://arabianvacc.com" className="nav-item">Home</a>
+            <a href="https://vatsim-arabian.com" className="nav-item">Home</a>
             <a href="/staff" className="nav-item">Staff</a>
-            <a href="https://library.arabianvacc.com" className="nav-item">Library</a>
+            <a href="https://library.vatsim-arabian.com" className="nav-item">Library</a>
           </div>
         </div>
       </div>
@@ -567,7 +545,7 @@ function App() {
               <h2 className="section-heading">Submit Feedback</h2>
               <form
                 className="feedback-form"
-                action="https://submit-form.com/i009DM2HW"
+                action="https://submit-form.com/vrpmQTfEn"
                 method="POST"
               >
                 <div className="form-row">
@@ -606,7 +584,7 @@ function App() {
                     type="text"
                     id="controllerName"
                     name="controllerName"
-                    placeholder="e.g., Chriss Klosowki"
+                    placeholder="e.g., John Doe"
                     required
                   />
                 </div>
@@ -616,7 +594,7 @@ function App() {
                     id="feedback"
                     name="feedback"
                     rows="5"
-                    placeholder="I have an issue with this controller. He is French..."
+                    placeholder="Great Controller!"
                     required
                   ></textarea>
                 </div>
@@ -624,7 +602,7 @@ function App() {
                 <input
                   type="hidden"
                   name="_redirect"
-                  value="https://arabianvacc.com"
+                  value="https://vatsim-arabian.com"
                 />
               </form>
             </div>
@@ -660,17 +638,17 @@ function App() {
         <div className="footer-content">
           <div className="footer-section">
             <h3>Arabian vACC</h3>
-            <p>Copyright © 2025 Arabian vACC</p>
+            <p>Copyright © 2026 Arabian vACC</p>
           </div>
           <div className="footer-section">
             <h4>Pilots</h4>
-            <a href="https://library.arabianvacc.com/pilots/">Airports & Charts</a>
-            <a href="https://library.arabianvacc.com/pilots/">Pilot Resource Center</a>
+            <a href="https://library.vatsim-arabian.com/pilots/">Airports & Charts</a>
+            <a href="https://library.vatsim-arabian.com/pilots/">Pilot Resource Center</a>
           </div>
           <div className="footer-section">
             <h4>Controllers</h4>
-            <a href="https://library.arabianvacc.com/getting_started/starting_atc_training/">Become a Controller</a>
-            <a href="https://library.arabianvacc.com/">Library</a>
+            <a href="https://library.vatsim-arabian.com/getting_started/starting_atc_training/">Become a Controller</a>
+            <a href="https://library.vatsim-arabian.com/">Library</a>
             <a href="#atc-roster">ATC Roster</a>
           </div>
           <div className="footer-section">
