@@ -12,6 +12,7 @@
   "dependencies": {
     "cobe": "^0.6.5",
     "framer-motion": "^12.23.22",
+    "node": "^24.12.0",
     "react": "^19.1.1",
     "react-dom": "^19.1.1",
     "react-globe.gl": "^2.36.0",
