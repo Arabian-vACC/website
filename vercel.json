@@ -1,0 +1,22 @@
+{
+  "buildCommand": "npm run build",
+  "outputDirectory": "dist",
+  "rewrites": [
+    {
+      "source": "/api/data(.*)",
+      "destination": "https://data.vatsim.net/v3/vatsim-data.json"
+    },
+    {
+      "source": "/api/bookings(.*)",
+      "destination": "https://atc-bookings.vatsim.net/api/booking"
+    },
+    {
+      "source": "/api/events(.*)",
+      "destination": "https://my.vatsim.net/api/v2/events/latest"
+    },
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
+    }
+  ]
+}
