@@ -82,11 +82,32 @@ const staff = [
     email: "abdulrahman.alamoodi@vatsim.me",
   },
   {
+    cid: 1641650,
+    code: 'ACCARB5',
+    title: 'Marketing Department Director',
+    name: 'Mohammed Osama',
+    email: 'mohammed.osama@vatsim.me'
+  },
+  {
     cid: 1648952,
     code: "ARBDPO",
     title: "Data Protection Officer",
     name: "Abdulrahman Alamoodi",
     email: "abdulrahman.alamoodi@vatsim.me",
+  },
+  {
+    cid: 1699621,
+    code: 'ARBMRKT',
+    title: 'Marketing Team Member',
+    name: 'Ibrahim Dave',
+    email: 'mohammed.osama@vatsim.me'
+  },
+  {
+    cid: 1787520,
+    code: 'ARBEVT',
+    title: 'Events Team Member',
+    name: 'Ali Ismail',
+    email: 'mohammed.osama@vatsim.me'
   },
 ];
 
@@ -123,13 +144,6 @@ const vacancies = [
     cid: '\u2014',
     code: 'ACCARB43',
     title: 'Muscat FIR Director',
-    name: 'Vacant - Open',
-    email: 'N/A'
-  },
-  {
-    cid: '\u2014',
-    code: 'ACCARB5',
-    title: 'Marketing Department Director',
     name: 'Vacant - Open',
     email: 'N/A'
   },
