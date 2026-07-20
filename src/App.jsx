@@ -68,11 +68,11 @@ const normalizeDate = (value, fallback) => {
 
 const staff = [
   {
-    cid: 1111111,
+    cid: 964520,
     code: "ACCARB1",
     title: "vACC Director",
-    name:  "RESERVED",
-    email: "board@vatsim.me",
+    name:  "Rohan Sturdy",
+    email: "rohan.sturdy@vatsim.me",
   },
   {
     cid: 1648952,
@@ -82,11 +82,11 @@ const staff = [
     email: "abdulrahman.alamoodi@vatsim.me",
   },
   {
-    cid: 1641650,
+    cid: 1747520,
     code: 'ACCARB5',
     title: 'Marketing Department Director',
-    name: 'Mohammed Osama',
-    email: 'mohammed.osama@vatsim.me'
+    name: 'Ali Ismail',
+    email: ali.ismail@vatsim-arabian.com'
   },
   {
     cid: 1648952,
