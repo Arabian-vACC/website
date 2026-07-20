@@ -244,56 +244,19 @@ const staff = [
     cid: 1648952,
     code: 'ARBDPO',
     title: 'Data Protection Officer',
+    name: 'Abdulrahman Alamoodi',
+    email: 'abdulrahman.alamoodi@vatsim.me'
   },
   {
-    cid: 1699621,
+    cid: 2001015,
     code: 'ARBMRKT',
     title: 'Marketing Team Member',
-    name: 'Ibrahim Dave',
-    email: 'mohammed.osama@vatsim.me'
-  },
-  {
-    cid: 1787520,
-    code: 'ARBEVT',
-    title: 'Events Team Member',
-    name: 'Ali Ismail',
-    email: 'mohammed.osama@vatsim.me'
-  },
+    name: 'Omar Ahmed',
+    email: 'ali.ismail@vatsin-arabian.com'
+  }
 ];
 
 const vacancies = [
-    {
-    cid: '\u2014',
-    code: 'ACCARB3',
-    title: 'ATC Training Director',
-    name: 'Vacant - Open',
-    email: 'N/A'
-  },
-  {
-    cid: '\u2014',
-    code: 'ACCARB4',
-    title: 'ATC Operations Department Director',
-    name: 'Vacant - Open',
-    email: 'N/A'
-  },
-  {
-    cid: '\u2014',
-    code: 'ACCARB42',
-    title: 'Doha FIR Director',
-    name: 'Vacant - Open',
-    email: 'N/A'
-  },
-  {
-    cid: '\u2014',
-    code: 'ACCARB44',
-    title: 'U.A.E FIR Director',
-    name: 'Vacant - Open',
-    email: 'N/A'
-  },
-  {
-    cid: '\u2014',
-    code: 'ACCARB43',
-    title: 'Muscat FIR Director',
   { cid: '—', code: 'ACCARB3', title: 'ATC Training Director', name: 'Vacant - Open', email: 'N/A' },
   { cid: '—', code: 'ACCARB4', title: 'ATC Operations Department Director', name: 'Vacant - Open', email: 'N/A' },
   { cid: '—', code: 'ACCARB44', title: 'U.A.E FIR Director', name: 'Vacant - Open', email: 'N/A' },
