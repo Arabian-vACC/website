@@ -541,6 +541,49 @@ function App() {
         </div>
       </section>
 
+      <section className="feedback" id="feedback">
+        <div className="section-head">
+          <span className="eyebrow">Tell Us How We Did</span>
+          <h2 className="section-title">Submit Feedback</h2>
+        </div>
+        <form
+          className="feedback-form"
+          action="https://submit-form.com/vrpmQTfEn"
+          method="POST"
+        >
+          <div className="form-row">
+            <div className="form-group">
+              <label htmlFor="cid">Your CID</label>
+              <input type="text" id="cid" name="cid" placeholder="Enter your VATSIM CID" required />
+            </div>
+            <div className="form-group">
+              <label htmlFor="position">Controller Position</label>
+              <input type="text" id="position" name="position" placeholder="e.g., OMDB_APP" required />
+            </div>
+          </div>
+          <div className="form-row">
+            <div className="form-group">
+              <label htmlFor="feedbackType">Feedback Type</label>
+              <select id="feedbackType" name="feedbackType" required defaultValue="">
+                <option value="" disabled>Select type</option>
+                <option value="positive">Positive</option>
+                <option value="negative">Negative</option>
+              </select>
+            </div>
+            <div className="form-group">
+              <label htmlFor="controllerName">Controller Name</label>
+              <input type="text" id="controllerName" name="controllerName" placeholder="e.g., John Doe" required />
+            </div>
+          </div>
+          <div className="form-group">
+            <label htmlFor="feedback">Feedback</label>
+            <textarea id="feedback" name="feedback" rows="5" placeholder="Great controller!" required></textarea>
+          </div>
+          <input type="hidden" name="_redirect" value="https://vatsim-arabian.com" />
+          <button type="submit" className="feedback-submit">Send Feedback</button>
+        </form>
+      </section>
+
       <section className="partners">
         <div className="section-head">
           <span className="eyebrow">Working Together</span>
