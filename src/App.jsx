@@ -90,11 +90,47 @@ const navGroups = [
   {
     label: 'About',
     items: [
+      { label: 'Roster', href: '/roster' },
       { label: 'Staff', href: '/staff' },
       { label: 'Home', href: 'https://vatsim-arabian.com' }
     ]
   }
 ];
+
+const ROSTER_POSITIONS = ['DEL', 'GND', 'TWR', 'APP', 'CTR'];
+
+function RosterTable({ rows }) {
+  return (
+    <table className="staff-table roster-table">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>CID</th>
+          <th>Rating</th>
+          <th>Endorsements</th>
+        </tr>
+      </thead>
+      <tbody>
+        {rows.length === 0 ? (
+          <tr><td colSpan={4} className="roster-empty">No controllers listed.</td></tr>
+        ) : rows.map(c => (
+          <tr key={c.cid}>
+            <td>{c.name || '—'}</td>
+            <td>{c.cid}</td>
+            <td>{c.rating || '—'}</td>
+            <td>
+              <div className="pos-badges">
+                {ROSTER_POSITIONS.map(p => (
+                  <span key={p} className={`pos-badge${c.positions?.includes(p) ? ' pos-on' : ''}`}>{p}</span>
+                ))}
+              </div>
+            </td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  );
+}
 
 const socialLinks = [
   { name: 'Discord', href: 'https://community.vatsim.net/' },
@@ -280,8 +316,14 @@ function App() {
   const [loadingLiveAtc, setLoadingLiveAtc] = useState(true);
   const [mobileOpen, setMobileOpen] = useState(false);
 
+  const [roster, setRoster] = useState(null);
+  const [loadingRoster, setLoadingRoster] = useState(true);
+  const [rosterError, setRosterError] = useState('');
+
   const isStaffPage =
     typeof window !== 'undefined' && window.location.pathname.toLowerCase().includes('staff');
+  const isRosterPage =
+    typeof window !== 'undefined' && window.location.pathname.toLowerCase().includes('roster');
 
   useEffect(() => {
     const controller = new AbortController();
@@ -345,6 +387,58 @@ function App() {
     loadLiveAtc();
     return () => controller.abort();
   }, []);
+
+  useEffect(() => {
+    if (!isRosterPage) return;
+    const controller = new AbortController();
+    const loadRoster = async () => {
+      try {
+        const res = await fetch('/api/roster', { signal: controller.signal });
+        if (!res.ok) throw new Error(`Roster request failed (${res.status})`);
+        setRoster(await res.json());
+      } catch (err) {
+        if (err.name !== 'AbortError') {
+          console.error(err);
+          setRosterError('The roster is temporarily unavailable. Please try again shortly.');
+        }
+      } finally {
+        setLoadingRoster(false);
+      }
+    };
+
+    loadRoster();
+    return () => controller.abort();
+  }, [isRosterPage]);
+
+  if (isRosterPage) {
+    return (
+      <div className="page">
+        <TopNav mobileOpen={mobileOpen} setMobileOpen={setMobileOpen} />
+        <main className="staff-page">
+          <div className="staff-heading">
+            <span className="eyebrow">Controllers</span>
+            <h1>Arabian vACC Roster</h1>
+            <p>Our live controller roster and position endorsements, synced from VATMENA HQ.</p>
+          </div>
+
+          <div className="staff-table-wrapper">
+            {loadingRoster ? (
+              <p className="roster-status">Loading roster…</p>
+            ) : rosterError ? (
+              <p className="roster-status">{rosterError}</p>
+            ) : (
+              <>
+                <RosterTable rows={roster?.home || []} />
+                <h2 className="vacancies-heading">Visiting Controllers</h2>
+                <RosterTable rows={roster?.visiting || []} />
+              </>
+            )}
+          </div>
+        </main>
+        <SiteFooter />
+      </div>
+    );
+  }
 
   if (isStaffPage) {
     const visibleStaff = staff.filter(member => member.cid && member.email !== 'N/A');

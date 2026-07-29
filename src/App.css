@@ -35,7 +35,6 @@ h1, h2, h3, h4 {
   position: relative;
 }
 
-/* ---------- Top Navigation ---------- */
 .site-nav {
   position: fixed;
   top: 0;
@@ -182,7 +181,6 @@ h1, h2, h3, h4 {
   border-radius: 2px;
 }
 
-/* ---------- Hero ---------- */
 .hero {
   position: relative;
   min-height: 100vh;
@@ -287,7 +285,6 @@ h1, h2, h3, h4 {
   border-color: rgba(255, 255, 255, 0.35);
 }
 
-/* ---------- Section shell ---------- */
 .events,
 .partners,
 .live-atc,
@@ -321,7 +318,6 @@ h1, h2, h3, h4 {
   color: var(--text-white);
 }
 
-/* ---------- Events ---------- */
 .events-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
@@ -427,7 +423,6 @@ h1, h2, h3, h4 {
   justify-content: center;
 }
 
-/* Skeleton */
 .skeleton-card {
   min-height: 360px;
   background: linear-gradient(90deg, rgba(255, 255, 255, 0.03) 25%, rgba(255, 255, 255, 0.07) 50%, rgba(255, 255, 255, 0.03) 75%);
@@ -441,7 +436,6 @@ h1, h2, h3, h4 {
   100% { background-position: -200% 0; }
 }
 
-/* ---------- Partners ---------- */
 .partners-grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -483,7 +477,6 @@ h1, h2, h3, h4 {
   max-width: 170px;
 }
 
-/* ---------- Live ATC ---------- */
 .live-atc .section-title {
   display: inline-flex;
   align-items: center;
@@ -565,7 +558,6 @@ h1, h2, h3, h4 {
   animation: shimmer 1.3s ease-in-out infinite;
 }
 
-/* ---------- Feedback ---------- */
 .feedback-form {
   display: flex;
   flex-direction: column;
@@ -647,7 +639,6 @@ h1, h2, h3, h4 {
   box-shadow: 0 10px 26px rgba(250, 172, 2, 0.35);
 }
 
-/* ---------- Footer ---------- */
 .site-footer {
   border-top: 1px solid var(--line);
   padding: 2.5rem 2rem;
@@ -702,7 +693,6 @@ h1, h2, h3, h4 {
   transform: translateY(-3px);
 }
 
-/* ---------- Staff page ---------- */
 .staff-page {
   max-width: 1100px;
   margin: 0 auto;
@@ -789,7 +779,6 @@ h1, h2, h3, h4 {
   font-weight: 500;
 }
 
-/* ---------- Responsive ---------- */
 @media (max-width: 960px) {
   .nav-burger {
     display: flex;
@@ -906,4 +895,44 @@ h1, h2, h3, h4 {
   .nav-cta {
     display: none;
   }
+}
+
+.roster-status {
+  text-align: center;
+  color: var(--text-gray);
+  padding: 48px 16px;
+  font-size: 15px;
+}
+
+.roster-empty {
+  text-align: center;
+  color: var(--text-gray);
+  padding: 22px;
+}
+
+.roster-table td {
+  vertical-align: middle;
+}
+
+.pos-badges {
+  display: flex;
+  gap: 5px;
+  flex-wrap: wrap;
+}
+
+.pos-badge {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.04);
+  color: rgba(255, 255, 255, 0.28);
+  border: 1px solid var(--line);
+}
+
+.pos-badge.pos-on {
+  background: var(--accent-soft);
+  color: var(--accent);
+  border-color: rgba(250, 172, 2, 0.4);
 }
