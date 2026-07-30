@@ -1,26 +1,22 @@
-import { head } from "@vercel/blob";
-
-const BLOB_PATH = "arb-roster.json";
-
 export default async function handler(req, res) {
-  res.setHeader("Access-Control-Allow-Origin", "*");
-  if (req.method === "OPTIONS") return res.status(204).end();
-  if (req.method !== "GET") {
-    res.setHeader("Allow", ["GET", "OPTIONS"]);
-    return res.status(405).json({ error: "Method not allowed" });
+  const key = (process.env.ROSTER_API_KEY || "").trim();
+  const url = process.env.HQ_ROSTER_URL || "https://hq.vatsim.me/api/public/roster";
+
+  if (!key) {
+    res.status(503).json({ error: "Roster key not configured. Set ROSTER_API_KEY in the Vercel environment." });
+    return;
   }
 
   try {
-    const blob = await head(BLOB_PATH, { token: process.env.BLOB_READ_WRITE_TOKEN });
-    const upstream = await fetch(blob.downloadUrl || blob.url, { cache: "no-store" });
+    const upstream = await fetch(url, { headers: { "X-API-Key": key } });
     if (!upstream.ok) {
-      return res.status(502).json({ error: "Roster store unavailable" });
+      res.status(upstream.status).json({ error: `HQ roster request failed (${upstream.status})` });
+      return;
     }
     const data = await upstream.json();
-    res.setHeader("Cache-Control", "public, s-maxage=120, stale-while-revalidate=600");
-    return res.status(200).json(data);
+    res.setHeader("Cache-Control", "public, s-maxage=300, stale-while-revalidate=600");
+    res.status(200).json(data);
   } catch {
-
-    return res.status(503).json({ error: "Roster not published yet. Please try again shortly." });
+    res.status(502).json({ error: "Failed to reach HQ roster API." });
   }
 }
