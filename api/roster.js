@@ -6,7 +6,7 @@ export default async function handler(req, res) {
   const keyInfo = {
     present: !!key,
     length: key.length,
-    prefix: key.slice(0, 6),
+    sample: key ? `${key.slice(0, 10)}…${key.slice(-4)}` : "",
     startsWithMena: key.startsWith("mena_"),
     hadWhitespace: rawKey !== key,
   };
