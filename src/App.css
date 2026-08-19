@@ -779,6 +779,87 @@ h1, h2, h3, h4 {
   font-weight: 500;
 }
 
+.team-heading {
+  text-align: left;
+}
+
+.team-group {
+  margin-bottom: 2.75rem;
+}
+
+.team-department {
+  color: var(--text-white);
+  font-size: 1.15rem;
+  font-weight: 600;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid var(--line);
+  margin-bottom: 0.25rem;
+}
+
+.team-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.5rem;
+  padding: 1.15rem 0;
+  border-bottom: 1px solid var(--line);
+}
+
+.team-row:last-child {
+  border-bottom: none;
+}
+
+.team-code {
+  color: var(--accent);
+  font-weight: 700;
+  font-size: 0.82rem;
+  letter-spacing: 0.08em;
+  margin-bottom: 0.35rem;
+}
+
+.team-name {
+  color: var(--text-white);
+  font-size: 1.05rem;
+  font-weight: 600;
+}
+
+.team-row-vacant .team-name {
+  color: var(--text-gray);
+  font-weight: 500;
+}
+
+.team-title {
+  color: var(--text-gray);
+  font-size: 0.9rem;
+  margin-top: 0.15rem;
+}
+
+.team-contact {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+  flex-shrink: 0;
+}
+
+.team-cid {
+  color: var(--text-gray);
+  font-size: 0.85rem;
+  white-space: nowrap;
+}
+
+.team-email {
+  padding: 0.5rem 1.2rem;
+  font-size: 0.85rem;
+}
+
+@media (max-width: 600px) {
+  .team-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.85rem;
+  }
+}
+
 .join-page {
   max-width: 1200px;
 }

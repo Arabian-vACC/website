@@ -283,58 +283,53 @@ function SiteFooter() {
   );
 }
 
-const staff = [
+const staffGroups = [
   {
-    cid: 964520,
-    code: 'ACCARB1',
-    title: 'vACC Director',
-    name: 'Rohan Sturdy',
-    email: 'rohan.sturdy@vatsim.me'
+    department: 'vACC Leadership',
+    members: [
+      { code: 'ACCARB1', title: 'vACC Director', name: 'Rohan Sturdy', cid: 964520, email: 'rohan.sturdy@vatsim.me' },
+      { code: 'ACCARB2', title: 'vACC Deputy Director', name: 'Vacant', cid: null, email: null },
+      { code: 'ARBDPO', title: 'Data Protection Officer', name: 'Abdulrahman Alamoodi', cid: 1648952, email: 'abdulrahman.alamoodi@vatsim.me' }
+    ]
   },
   {
-    cid: 1648952,
-    code: 'ACCARB2',
-    title: 'vACC Deputy Director',
-    name: 'Abdulrahman Alamoodi',
-    email: 'abdulrahman.alamoodi@vatsim.me'
+    department: 'ATC Training',
+    members: [
+      { code: 'ACCARB3', title: 'ATC Training Director', name: 'Vacant', cid: null, email: null }
+    ]
   },
   {
-    cid: 1787520,
-    code: 'ACCARB5',
-    title: 'Marketing Department Director',
-    name: 'Ali Ismail',
-    email: 'ali.ismail@vatsim.me'
-  },
-    {
-    cid: 1699621,
-    code: 'ARB51',
-    title: 'Deputy Events and Marketing',
-    name: 'Ibrahim Dave',
-    email: 'ibrahim.dave@vatsim-arabian.com'
+    department: 'Operations',
+    members: [
+      { code: 'ACCARB4', title: 'ATC Operations Department Director', name: 'Vacant', cid: null, email: null },
+      { code: 'ACCARB44', title: 'U.A.E FIR Director', name: 'Vacant', cid: null, email: null },
+      { code: 'ACCARB43', title: 'Muscat FIR Director', name: 'Vacant', cid: null, email: null }
+    ]
   },
   {
-    cid: 1648952,
-    code: 'ARBDPO',
-    title: 'Data Protection Officer',
-    name: 'Abdulrahman Alamoodi',
-    email: 'abdulrahman.alamoodi@vatsim.me'
+    department: 'Membership',
+    members: [
+      { code: 'ACCARB6', title: 'Membership Department Director', name: 'Vacant', cid: null, email: null },
+      { code: 'ARB61', title: 'Membership Deputy Director', name: 'Vacant', cid: null, email: null },
+      { code: 'ARBMEM', title: 'Membership Team Member', name: 'Albarraa Abuelgasim', cid: 1754467, email: 'albarraa.abuelgasim@vatsim-arabian.com' },
+      { code: 'ARBMEM', title: 'Membership Team Member', name: 'Christopher Maskine', cid: 1758854, email: 'christopher.maskine@vatsim-arabian.com' },
+      { code: 'ARBMEM', title: 'Membership Team Member', name: 'Yahia Farag', cid: 1865447, email: 'yahia.farag@vatsim-arabian.com' }
+    ]
   },
   {
-    cid: 2001015,
-    code: 'ARBMRKT',
-    title: 'Marketing Team Member',
-    name: 'Omar Ahmed',
-    email: 'ali.ismail@vatsin-arabian.com'
+    department: 'Events & Marketing',
+    members: [
+      { code: 'ACCARB5', title: 'Marketing Department Director', name: 'Ali Ismail', cid: 1787520, email: 'ali.ismail@vatsim.me' },
+      { code: 'ARB51', title: 'Deputy Events and Marketing', name: 'Ibrahim Dave', cid: 1699621, email: 'ibrahim.dave@vatsim-arabian.com' },
+      { code: 'ARBMRKT', title: 'Marketing Team Member', name: 'Omar Ahmed', cid: 2001015, email: 'ali.ismail@vatsin-arabian.com' }
+    ]
+  },
+  {
+    department: 'Technical',
+    members: [
+      { code: 'ACCARB7', title: 'Technical Department Director', name: 'Vacant', cid: null, email: null }
+    ]
   }
-];
-
-const vacancies = [
-  { cid: '—', code: 'ACCARB3', title: 'ATC Training Director', name: 'Vacant - Open', email: 'N/A' },
-  { cid: '—', code: 'ACCARB4', title: 'ATC Operations Department Director', name: 'Vacant - Open', email: 'N/A' },
-  { cid: '—', code: 'ACCARB44', title: 'U.A.E FIR Director', name: 'Vacant - Open', email: 'N/A' },
-  { cid: '—', code: 'ACCARB43', title: 'Muscat FIR Director', name: 'Vacant - Open', email: 'N/A' },
-  { cid: '—', code: 'ACCARB6', title: 'Membership Department Director', name: 'Vacant - Open', email: 'N/A' },
-  { cid: '—', code: 'ACCARB7', title: 'Technical Department Director', name: 'Vacant - Open', email: 'N/A' }
 ];
 
 function InternalTransferPlan() {
@@ -657,65 +652,39 @@ function App() {
   }
 
   if (isStaffPage) {
-    const visibleStaff = staff.filter(member => member.cid && member.email !== 'N/A');
-    const order = ['ACCARB1', 'ACCARB2', 'ACCARB3', 'ACCARB31', 'ACCARB4', 'ACCARB44', 'ACCARB5', 'ACCARB6', 'ACCARB7', 'ARBDPO'];
-    const orderedStaff = order
-      .map(code => visibleStaff.find(member => member.code === code))
-      .filter(Boolean);
-
     return (
       <div className="page">
         <TopNav mobileOpen={mobileOpen} setMobileOpen={setMobileOpen} />
-        <main className="staff-page">
-          <div className="staff-heading">
+        <main className="staff-page team-page">
+          <div className="staff-heading team-heading">
             <span className="eyebrow">The Team</span>
-            <h1>Arabian vACC Leadership</h1>
-            <p>Meet the team behind Arabian vACC.</p>
+            <h1>Team</h1>
+            <p>The staff running Arabian vACC.</p>
           </div>
 
-          <div className="staff-table-wrapper">
-            <table className="staff-table">
-              <thead>
-                <tr>
-                  <th>Title</th>
-                  <th>Name</th>
-                  <th>Email</th>
-                  <th>CID</th>
-                </tr>
-              </thead>
-              <tbody>
-                {orderedStaff.map(member => (
-                  <tr key={member.code}>
-                    <td>
-                      <div className="staff-code">{member.code}</div>
-                      <div className="staff-title indented">{member.title}</div>
-                    </td>
-                    <td>{member.name}</td>
-                    <td><a className="staff-email" href={`mailto:${member.email}`}>{member.email}</a></td>
-                    <td>{member.cid}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-
-            <h2 className="vacancies-heading">Vacancies</h2>
-            <table className="staff-table">
-              <thead>
-                <tr>
-                  <th>Position</th>
-                </tr>
-              </thead>
-              <tbody>
-                {vacancies.map(role => (
-                  <tr key={role.code}>
-                    <td>
-                      <div className="staff-code">{role.code}</div>
-                      <div className="staff-title indented">{role.title}</div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+          <div className="team-list">
+            {staffGroups.map(group => (
+              <div className="team-group" key={group.department}>
+                <h2 className="team-department">{group.department}</h2>
+                <div className="team-rows">
+                  {group.members.map(member => (
+                    <div className={`team-row${member.name === 'Vacant' ? ' team-row-vacant' : ''}`} key={`${member.code}-${member.cid ?? member.name}`}>
+                      <div className="team-person">
+                        <div className="team-code">{member.code}</div>
+                        <div className="team-name">{member.name}</div>
+                        <div className="team-title">{member.title}</div>
+                      </div>
+                      <div className="team-contact">
+                        {member.cid && <span className="team-cid">CID {member.cid}</span>}
+                        {member.email && (
+                          <a className="btn btn-primary team-email" href={`mailto:${member.email}`}>Email</a>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ))}
           </div>
         </main>
         <SiteFooter />
