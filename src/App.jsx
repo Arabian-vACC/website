@@ -288,8 +288,7 @@ const staffGroups = [
     department: 'vACC Leadership',
     members: [
       { code: 'ACCARB1', title: 'vACC Director', name: 'Rohan Sturdy', cid: 964520, email: 'rohan.sturdy@vatsim.me' },
-      { code: 'ACCARB2', title: 'vACC Deputy Director', name: 'Vacant', cid: null, email: null },
-      { code: 'ARBDPO', title: 'Data Protection Officer', name: 'Abdulrahman Alamoodi', cid: 1648952, email: 'abdulrahman.alamoodi@vatsim.me' }
+      { code: 'ACCARB2', title: 'vACC Deputy Director', name: 'Vacant', cid: null, email: null }
     ]
   },
   {
