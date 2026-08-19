@@ -779,6 +779,245 @@ h1, h2, h3, h4 {
   font-weight: 500;
 }
 
+.join-page {
+  max-width: 1200px;
+}
+
+.join-section {
+  margin-bottom: 4.5rem;
+}
+
+.join-section .section-head {
+  margin-bottom: 2rem;
+}
+
+.join-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1.75rem;
+}
+
+.join-card {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  padding: 2rem;
+  transition: transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.join-card:hover {
+  transform: translateY(-6px);
+  border-color: rgba(250, 172, 2, 0.4);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+}
+
+.join-card-wide {
+  max-width: 820px;
+}
+
+.join-card-title {
+  color: var(--text-white);
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-bottom: 0.85rem;
+}
+
+.join-card-body {
+  color: var(--text-gray);
+  line-height: 1.65;
+  margin-bottom: 1.5rem;
+  flex: 1;
+}
+
+.join-card-cta {
+  margin-top: auto;
+}
+
+.induction-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+  gap: 1.75rem;
+}
+
+.induction-card {
+  display: flex;
+  flex-direction: column;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  padding: 2.25rem;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.induction-card:hover {
+  border-color: rgba(250, 172, 2, 0.4);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+}
+
+.induction-tag {
+  display: inline-block;
+  align-self: flex-start;
+  color: var(--accent);
+  background: rgba(250, 172, 2, 0.1);
+  border: 1px solid rgba(250, 172, 2, 0.3);
+  border-radius: 999px;
+  padding: 0.3rem 0.9rem;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  margin-bottom: 1rem;
+}
+
+.induction-title {
+  color: var(--text-white);
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin-bottom: 0.75rem;
+}
+
+.induction-intro {
+  color: var(--text-gray);
+  line-height: 1.65;
+  margin-bottom: 1.5rem;
+}
+
+.induction-body {
+  border-top: 1px solid var(--line);
+  padding-top: 1.5rem;
+}
+
+.induction-placeholder {
+  color: var(--text-gray);
+  font-style: italic;
+  opacity: 0.7;
+}
+
+.join-steps-list {
+  margin: 0 0 1.5rem 1.25rem;
+  padding: 0;
+  color: var(--text-gray);
+  line-height: 1.9;
+}
+
+.join-steps-list li {
+  padding-left: 0.35rem;
+}
+
+.join-steps-list a {
+  color: var(--accent);
+  text-decoration: none;
+}
+
+.join-steps-list a:hover {
+  text-decoration: underline;
+}
+
+.induction-card-active {
+  border-color: rgba(250, 172, 2, 0.5);
+}
+
+.induction-toggle {
+  align-self: flex-start;
+}
+
+.induction-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.transfer-page .transfer-detail {
+  margin-top: 0;
+}
+
+.transfer-back {
+  margin-top: 2rem;
+}
+
+.transfer-back a {
+  color: var(--accent);
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.transfer-back a:hover {
+  text-decoration: underline;
+}
+
+.transfer-detail {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  padding: 2.5rem;
+  margin-top: 1.75rem;
+}
+
+.transfer-detail-title {
+  color: var(--text-white);
+  font-size: 1.6rem;
+  font-weight: 700;
+  margin-bottom: 1.25rem;
+}
+
+.transfer-detail-lead {
+  color: var(--text-gray);
+  line-height: 1.7;
+  margin-bottom: 1rem;
+}
+
+.transfer-note {
+  color: var(--text-white);
+  background: rgba(250, 172, 2, 0.08);
+  border-left: 3px solid var(--accent);
+  border-radius: 8px;
+  padding: 0.9rem 1.1rem;
+  line-height: 1.6;
+  margin: 1.25rem 0;
+}
+
+.transfer-step-head {
+  color: var(--accent);
+  font-size: 1.15rem;
+  font-weight: 600;
+  margin: 2rem 0 0.75rem;
+}
+
+.transfer-detail p {
+  color: var(--text-gray);
+  line-height: 1.7;
+  margin-bottom: 0.9rem;
+}
+
+.transfer-detail p strong {
+  color: var(--text-white);
+}
+
+.transfer-list {
+  margin: 0 0 1rem 1.25rem;
+  padding: 0;
+  color: var(--text-gray);
+  line-height: 1.8;
+}
+
+.transfer-list li {
+  padding-left: 0.35rem;
+  margin-bottom: 0.35rem;
+}
+
+.transfer-detail .staff-table-wrapper {
+  margin: 1rem 0 1.25rem;
+}
+
+.transfer-signoff {
+  margin-top: 2rem;
+  color: var(--text-white);
+  font-style: italic;
+}
+
 @media (max-width: 960px) {
   .nav-burger {
     display: flex;

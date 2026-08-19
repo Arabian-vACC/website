@@ -83,6 +83,7 @@ const navGroups = [
   {
     label: 'Controllers',
     items: [
+      { label: 'Become a Controller', href: '/controllers/join' },
       { label: 'ATC Training', href: 'https://library.vatsim-arabian.com/getting_started/starting_atc_training/' },
       { label: 'Library', href: 'https://library.vatsim-arabian.com' }
     ]
@@ -94,6 +95,41 @@ const navGroups = [
       { label: 'Staff', href: '/staff' },
       { label: 'Home', href: 'https://vatsim-arabian.com' }
     ]
+  }
+];
+
+const joinSteps = [
+  {
+    title: 'New to VATSIM?',
+    body: 'When creating your VATSIM account, choose Europe, Middle East, and Africa (EMEA) as your region, and Middle East and North Africa (MENA) as your division when prompted.',
+    cta: { label: 'Create VATSIM Account', href: 'https://my.vatsim.net/register' }
+  },
+  {
+    title: 'Already a VATSIM Member in EMEA?',
+    body: 'Open a support ticket in the VATMENA HQ Support Tickets system. Fill in the required information fields, submit the ticket, and await a reply with the next steps.',
+    cta: { label: 'VATMENA HQ', href: 'https://hq.vatsim.me' }
+  },
+  {
+    title: 'Need to Change Regions?',
+    body: 'Log in to your myVATSIM account and locate the Member Help section in the left menu. Under Member Help, select Change Region and complete the form.',
+    cta: { label: 'myVATSIM', href: 'https://my.vatsim.net/' }
+  }
+];
+
+const inductionPlans = [
+  {
+    key: 'internal',
+    tag: 'Within VATMENA',
+    title: 'Internal Transfer',
+    intro: 'For controllers transferring to Arabian vACC from another vACC within the VATMENA division.',
+    url: '/controllers/transfer/internal'
+  },
+  {
+    key: 'external',
+    tag: 'From Another Division',
+    title: 'External Transfer',
+    intro: 'For controllers transferring to Arabian vACC from another VATSIM division.',
+    url: '/controllers/transfer/external'
   }
 ];
 
@@ -200,7 +236,7 @@ function TopNav({ mobileOpen, setMobileOpen }) {
         </nav>
 
         <a
-          href="https://library.vatsim-arabian.com/getting_started/starting_atc_training/"
+          href="/controllers/join"
           className="nav-cta"
         >
           Join Now
@@ -301,6 +337,179 @@ const vacancies = [
   { cid: '—', code: 'ACCARB7', title: 'Technical Department Director', name: 'Vacant - Open', email: 'N/A' }
 ];
 
+function InternalTransferPlan() {
+  return (
+    <div className="transfer-detail" id="transfer-internal">
+      <h3 className="transfer-detail-title">Internal Transfer — Controller Training Plan</h3>
+      <p className="transfer-detail-lead">
+        This document sets out the training pathway for controllers transferring to the Arabian vACC from another VATSIM
+        division or subdivision. Its purpose is to ensure that every incoming controller is familiar with local
+        procedures, Standard Operating Procedures (SOPs) and Letters of Agreement (LOAs) before providing air traffic
+        services independently within Arabian vACC airspace.
+      </p>
+      <p className="transfer-detail-lead">
+        Transferring controllers retain the rating they earned in their previous division. This plan is therefore not a
+        re-rating programme — it is a structured familiarisation and validation process designed to bring experienced
+        controllers up to speed with the Arabian environment as efficiently as possible.
+      </p>
+
+      <h4 className="transfer-step-head">Transfer Pathway at a Glance</h4>
+      <ol className="transfer-list">
+        <li>Open a support ticket on hq.vatsim.me requesting a transfer to Arabian vACC and agree to the Transfer Controller Policy.</li>
+        <li>Receive your assigned aerodrome based on your controller rating.</li>
+        <li>Complete a familiarisation theory session covering local SOPs and LOAs.</li>
+        <li>Control 10–15 hours on your assigned position.</li>
+        <li>Request a Transfer Checkout Session via a support ticket when ready.</li>
+        <li>Pass the checkout to complete your transfer.</li>
+      </ol>
+
+      <h4 className="transfer-step-head">Step 1 — Transfer Request &amp; Policy Agreement</h4>
+      <p>Open a support ticket through hq.vatsim.me stating that you wish to transfer to the Arabian vACC. Please include your CID, current rating and current division/subdivision in the ticket.</p>
+      <p>Once your ticket has been received, the training team will send you the Arabian vACC Transfer Controller Policy. You must read and formally agree to this policy before your transfer training can begin. The policy sets out your obligations during the transfer period, including activity expectations and the conditions under which a transfer may be discontinued.</p>
+
+      <h4 className="transfer-step-head">Step 2 — Position Assignment</h4>
+      <p>Following acceptance of the policy, you will be assigned a training aerodrome appropriate to your controller rating. All familiarisation hours and your final checkout will take place at this aerodrome.</p>
+      <div className="staff-table-wrapper">
+        <table className="staff-table">
+          <thead>
+            <tr><th>Rating</th><th>Eligible Aerodromes</th><th>Checkout Position</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>S2</td><td>Abu Dhabi (OMAA), Muscat (OOMS) or Sharjah (OMSJ)</td><td>Tower (TWR) at the assigned aerodrome</td></tr>
+            <tr><td>S3</td><td>Abu Dhabi (OMAA) or Muscat (OOMS)</td><td>Approach (APP) at the assigned aerodrome</td></tr>
+            <tr><td>C1</td><td>Muscat (OOMS)</td><td>Muscat Control (Area / Enroute)</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p>Where more than one aerodrome is eligible for your rating, the training team will allocate one based on current staffing needs and mentor availability. You may state a preference in your ticket, and it will be accommodated where possible.</p>
+
+      <h4 className="transfer-step-head">Step 3 — Familiarisation Theory Session</h4>
+      <p>Before controlling, you will attend a familiarisation theory session with a member of the training team. This session covers the material you need in order to operate safely and in accordance with local procedures, including:</p>
+      <ul className="transfer-list">
+        <li>Standard Operating Procedures (SOPs) for your assigned aerodrome and position;</li>
+        <li>Letters of Agreement (LOAs) with neighbouring sectors and adjacent vACCs;</li>
+        <li>Local airspace structure, coordination requirements and handoff procedures;</li>
+        <li>Any regional differences in phraseology or procedure you should be aware of.</li>
+      </ul>
+      <p>Come prepared: review the published SOPs and charts for your assigned aerodrome beforehand so the session can focus on questions and local nuances rather than first principles.</p>
+
+      <h4 className="transfer-step-head">Step 4 — Consolidation: 10 to 15 Hours on Position</h4>
+      <p>You will then control your assigned position for a minimum of 10 and up to 15 hours. This consolidation period is where you convert theory into practice: applying the SOPs and LOAs in live traffic, building familiarity with the local flow, and gaining genuine experience on the position.</p>
+      <p>These hours are logged automatically through the network. During this period you are encouraged to stay in contact with the training team, ask questions, and request informal feedback — the goal is that by the end of your consolidation you feel fully at home on the position.</p>
+
+      <h4 className="transfer-step-head">Step 5 — Requesting the Transfer Checkout</h4>
+      <p>Once you have completed your consolidation hours and are confident that you will pass the Transfer Checkout Session, open a support ticket on hq.vatsim.me requesting a checkout on your allocated position. A mentor or examiner will then coordinate a date and time with you.</p>
+      <p>Do not rush this step. The checkout is assessed to the same standard expected of home controllers, so it is in your interest to request it only when you are consistently comfortable on the position.</p>
+
+      <h4 className="transfer-step-head">Step 6 — Checkout Outcome</h4>
+      <p><strong>Pass</strong> — your transfer is complete. You become a full home controller of the Arabian vACC, with all the privileges of your rating, and you may work towards further positions and endorsements through the standard training system.</p>
+      <p><strong>Fail</strong> — the transfer is unsuccessful and you will return to your previous division or subdivision. The examiner will provide a debrief explaining the outcome, and you may discuss with the training team whether a future transfer attempt is appropriate.</p>
+
+      <h4 className="transfer-step-head">General Notes</h4>
+      <ul className="transfer-list">
+        <li>All training activity is coordinated through the support ticket system on hq.vatsim.me — please use it for all requests and correspondence.</li>
+        <li>Timelines are flexible; this is a hobby and the training team will work around your availability. Equally, extended inactivity during a transfer may result in the process being closed under the Transfer Controller Policy.</li>
+        <li>All VATSIM Global Ratings Policy and Transfer &amp; Visiting Controller Policy provisions apply in addition to this plan.</li>
+        <li>Questions at any stage are welcome — contact the Arabian vACC training team via ticket or Discord.</li>
+      </ul>
+      <p className="transfer-signoff">Arabian vACC Training Department — we look forward to welcoming you to Arabian skies.</p>
+    </div>
+  );
+}
+
+function ExternalTransferPlan() {
+  return (
+    <div className="transfer-detail" id="transfer-external">
+      <h3 className="transfer-detail-title">External Transfer — Controller Training Plan</h3>
+      <p className="transfer-detail-lead">
+        This training plan outlines the process for controllers transferring into the Arabian vACC from another VATSIM
+        Region and/or Division. The objective is to ensure all incoming controllers are familiar with local procedures,
+        Standard Operating Procedures (SOPs), and Letters of Agreement (LOAs) before operating independently within
+        Arabian airspace.
+      </p>
+      <p className="transfer-detail-lead">
+        Controllers keep the rating earned in their previous Region or Division. As such, this programme is not intended
+        as a rating course, but rather a structured familiarisation and validation pathway designed to integrate
+        experienced controllers into the Arabian environment efficiently and safely.
+      </p>
+      <p className="transfer-note">
+        Throughout the entire transfer period, controllers are not permitted to participate in events. Event
+        participation is only available once the transfer has been completed successfully.
+      </p>
+
+      <h4 className="transfer-step-head">Transfer Pathway Overview</h4>
+      <ol className="transfer-list">
+        <li>Submit a support ticket through hq.vatsim.me requesting a transfer to Arabian vACC and accept the Transfer Controller Policy.</li>
+        <li>Receive an aerodrome assignment based on your current rating.</li>
+        <li>Attend a familiarisation session covering local procedures and agreements.</li>
+        <li>Complete a competency check session. On passing, you are granted unrestricted approvals on the assigned position.</li>
+        <li>Complete 10 hours on the assigned position.</li>
+        <li>Update your support ticket requesting a Transfer Checkout once the hours are complete.</li>
+        <li>Successfully complete the checkout to finalise the transfer.</li>
+      </ol>
+
+      <h4 className="transfer-step-head">Step 1 — Transfer Request and Policy Acceptance</h4>
+      <p>Create a support ticket through hq.vatsim.me stating your intention to transfer to Arabian vACC. Include your CID, current rating, and existing Region and Division.</p>
+      <p>Following receipt of the request, the training team will provide the Arabian vACC Transfer Controller Policy. This document must be reviewed and accepted before training can commence. It details activity expectations, responsibilities, the restriction on event participation during the transfer period, and circumstances that may result in the transfer process being discontinued.</p>
+
+      <h4 className="transfer-step-head">Step 2 — Position Assignment</h4>
+      <p>Once the policy has been accepted, an aerodrome appropriate to your rating will be assigned. All familiarisation, the competency check, consolidation hours, and the final checkout will take place at this location.</p>
+      <div className="staff-table-wrapper">
+        <table className="staff-table">
+          <thead>
+            <tr><th>Rating</th><th>Eligible Aerodromes</th><th>Position</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>S1</td><td>Abu Dhabi (OMAA), Muscat (OOMS) or Sharjah (OMSJ)</td><td>Ground (GND)</td></tr>
+            <tr><td>S2</td><td>Abu Dhabi (OMAA), Muscat (OOMS) or Sharjah (OMSJ)</td><td>Tower (TWR)</td></tr>
+            <tr><td>S3</td><td>Abu Dhabi (OMAA) or Muscat (OOMS)</td><td>Approach (APP)</td></tr>
+            <tr><td>C1</td><td>Muscat (OOMS)</td><td>Area Control</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p>Where multiple aerodromes are available, allocation will be based on operational requirements and mentor availability. Preferences may be indicated and will be considered where practical.</p>
+
+      <h4 className="transfer-step-head">Step 3 — Familiarisation Session</h4>
+      <p>Before controlling, you will attend a theory session led by a member of the training team. Topics include:</p>
+      <ul className="transfer-list">
+        <li>Local SOPs relevant to the assigned position.</li>
+        <li>Applicable LOAs with neighbouring sectors and vACCs.</li>
+        <li>Airspace structure, coordination practices, and handoff procedures.</li>
+        <li>Regional procedural or phraseology differences.</li>
+      </ul>
+      <p>Controllers are encouraged to review charts and published procedures before the session to maximise its effectiveness.</p>
+      <p>Controllers who are confident in the local procedures may elect to self-study the published SOPs and LOAs and proceed directly to the competency check, rather than attending a guided familiarisation session. This should be requested through the support ticket.</p>
+
+      <h4 className="transfer-step-head">Step 4 — Competency Check Session</h4>
+      <p>A mentor or examiner will conduct a competency check to confirm that you can safely operate the assigned position to the required standard. This assesses your understanding of local SOPs, LOAs, coordination, and phraseology in a live or simulated environment.</p>
+      <p><strong>Pass:</strong> you are granted unrestricted approvals on the assigned position and may begin the consolidation period.</p>
+      <p><strong>Fail:</strong> feedback will be provided and a further competency check may be arranged once you have addressed the areas identified. You may not operate the position unrestricted until the competency check is passed.</p>
+
+      <h4 className="transfer-step-head">Step 5 — Consolidation Period (10 hours)</h4>
+      <p>Following a successful competency check, controllers must complete 10 hours on the assigned position. This period is intended to reinforce knowledge through practical application in live traffic conditions.</p>
+      <p>Hours are recorded automatically through the network. Throughout this stage, controllers are encouraged to seek guidance, ask questions, and obtain feedback from the training team.</p>
+
+      <h4 className="transfer-step-head">Step 6 — Requesting a Checkout</h4>
+      <p>Once the 10 hours have been completed, update your existing support ticket to request a Transfer Checkout Session. A mentor or examiner will coordinate a suitable date and time. Controllers should only request a checkout when consistently comfortable operating the position independently.</p>
+
+      <h4 className="transfer-step-head">Step 7 — Checkout Result</h4>
+      <p><strong>Pass:</strong> the transfer is completed successfully. You become a home controller within Arabian vACC, are cleared to participate in events, and may continue progressing through the standard training framework.</p>
+      <p><strong>Fail:</strong> the transfer request is unsuccessful and the controller returns to their previous Region and/or Division. Feedback will be provided and future transfer opportunities may be discussed with the training team.</p>
+
+      <h4 className="transfer-step-head">Additional Information</h4>
+      <ul className="transfer-list">
+        <li>Participation in events is not permitted at any stage of the transfer period.</li>
+        <li>All transfer-related communication must be conducted through the support ticket system.</li>
+        <li>Training timelines remain flexible and will be arranged around controller availability.</li>
+        <li>Extended inactivity may result in closure of the transfer process in accordance with the Transfer Controller Policy.</li>
+        <li>Relevant provisions of the VATSIM Global Ratings Policy and Transfer &amp; Visiting Controller Policy remain applicable.</li>
+        <li>Questions may be directed to the Arabian vACC Training Team through tickets or Discord.</li>
+      </ul>
+      <p className="transfer-signoff">Arabian vACC Training Department — we look forward to welcoming you to Arabian vACC.</p>
+    </div>
+  );
+}
+
 function App() {
   const partnerLogos = [
     { name: 'Qatar', file: 'qatar.png', url: 'https://mynextairline.com/airlines/oryx-virtual', size: 'wide' },
@@ -315,6 +524,7 @@ function App() {
   const [liveAtc, setLiveAtc] = useState([]);
   const [loadingLiveAtc, setLoadingLiveAtc] = useState(true);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [openPlan, setOpenPlan] = useState(null);
 
   const [roster, setRoster] = useState(null);
   const [loadingRoster, setLoadingRoster] = useState(true);
@@ -324,6 +534,12 @@ function App() {
     typeof window !== 'undefined' && window.location.pathname.toLowerCase().includes('staff');
   const isRosterPage =
     typeof window !== 'undefined' && window.location.pathname.toLowerCase().includes('roster');
+  const isJoinPage =
+    typeof window !== 'undefined' && window.location.pathname.toLowerCase().includes('join');
+  const isTransferInternalPage =
+    typeof window !== 'undefined' && window.location.pathname.toLowerCase().includes('transfer/internal');
+  const isTransferExternalPage =
+    typeof window !== 'undefined' && window.location.pathname.toLowerCase().includes('transfer/external');
 
   useEffect(() => {
     const controller = new AbortController();
@@ -507,6 +723,116 @@ function App() {
     );
   }
 
+  if (isTransferInternalPage || isTransferExternalPage) {
+    return (
+      <div className="page">
+        <TopNav mobileOpen={mobileOpen} setMobileOpen={setMobileOpen} />
+        <main className="staff-page transfer-page">
+          <div className="staff-heading">
+            <span className="eyebrow">Transfers</span>
+            <h1>Transferring to Arabian vACC</h1>
+          </div>
+          {isTransferInternalPage ? <InternalTransferPlan /> : <ExternalTransferPlan />}
+          <p className="transfer-back"><a href="/controllers/join">← Back to Become a Controller</a></p>
+        </main>
+        <SiteFooter />
+      </div>
+    );
+  }
+
+  if (isJoinPage) {
+    return (
+      <div className="page">
+        <TopNav mobileOpen={mobileOpen} setMobileOpen={setMobileOpen} />
+        <main className="staff-page join-page">
+          <div className="staff-heading">
+            <span className="eyebrow">Controllers</span>
+            <h1>Become a Controller</h1>
+            <p>Join the Arabian vACC and control the virtual skies of the U.A.E, Qatar and Oman on VATSIM.</p>
+          </div>
+
+          <section className="join-section">
+            <div className="section-head">
+              <span className="eyebrow">Getting Started</span>
+              <h2 className="section-title">How to Join</h2>
+            </div>
+            <div className="join-grid">
+              {joinSteps.map(step => (
+                <div className="join-card" key={step.title}>
+                  <h3 className="join-card-title">{step.title}</h3>
+                  <p className="join-card-body">{step.body}</p>
+                  <a className="btn btn-primary join-card-cta" href={step.cta.href} target="_blank" rel="noreferrer">
+                    {step.cta.label}
+                  </a>
+                </div>
+              ))}
+            </div>
+          </section>
+
+          <section className="join-section">
+            <div className="section-head">
+              <span className="eyebrow">Transfers</span>
+              <h2 className="section-title">Transferring to Arabian vACC</h2>
+            </div>
+            <div className="induction-grid">
+              {inductionPlans.map(plan => (
+                <div className={`induction-card${openPlan === plan.key ? ' induction-card-active' : ''}`} key={plan.key}>
+                  <span className="induction-tag">{plan.tag}</span>
+                  <h3 className="induction-title">{plan.title}</h3>
+                  <p className="induction-intro">{plan.intro}</p>
+                  <div className="induction-body">
+                    <div className="induction-actions">
+                      <button
+                        type="button"
+                        className="btn btn-primary induction-toggle"
+                        onClick={() => setOpenPlan(openPlan === plan.key ? null : plan.key)}
+                      >
+                        {openPlan === plan.key ? 'Hide Plan' : 'Read Full Plan'}
+                      </button>
+                      <a className="btn btn-ghost" href={plan.url} target="_blank" rel="noreferrer">
+                        Open in New Window
+                      </a>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+            {openPlan === 'internal' && <InternalTransferPlan />}
+            {openPlan === 'external' && <ExternalTransferPlan />}
+          </section>
+
+          <section className="join-section">
+            <div className="section-head">
+              <span className="eyebrow">Visiting</span>
+              <h2 className="section-title">Visiting Controllers</h2>
+            </div>
+            <div className="join-card join-card-wide">
+              <h3 className="join-card-title">Want to Control in Arabian as a Visitor?</h3>
+              <p className="join-card-body">
+                Visiting applications are managed centrally by VATMENA HQ. To apply:
+              </p>
+              <ol className="join-steps-list">
+                <li>Go to <a href="https://hq.vatsim.me" target="_blank" rel="noreferrer">hq.vatsim.me</a> and log in</li>
+                <li>Open Sub Division &rarr; ATC</li>
+                <li>Select Apply for Visiting</li>
+                <li>Choose Arabian vACC</li>
+                <li>Join the Arabian Discord server through <a href="https://community.vatsim.net/" target="_blank" rel="noreferrer">community.vatsim.net</a></li>
+              </ol>
+              <p className="join-card-body">
+                Eligibility: S3 or above from any VATSIM division, or S2 and above if you are already a VATMENA member.
+                You must hold an active rating on your home network.
+              </p>
+              <a className="btn btn-primary join-card-cta" href="https://hq.vatsim.me" target="_blank" rel="noreferrer">
+                VATMENA HQ
+              </a>
+            </div>
+          </section>
+        </main>
+        <SiteFooter />
+      </div>
+    );
+  }
+
   return (
     <div className="page">
       <TopNav mobileOpen={mobileOpen} setMobileOpen={setMobileOpen} />
@@ -528,7 +854,7 @@ function App() {
           <div className="hero-actions">
             <a
               className="btn btn-primary"
-              href="https://library.vatsim-arabian.com/getting_started/starting_atc_training/"
+              href="/controllers/join"
             >
               Join Now
             </a>
