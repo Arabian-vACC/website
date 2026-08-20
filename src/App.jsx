@@ -1,5 +1,7 @@
 import { useEffect, useState } from 'react';
 import { motion as Motion } from 'framer-motion';
+import SectorMap from './SectorMap.jsx';
+import { inView } from './mapGeo.js';
 import './App.css';
 
 const TARGET_ICAOS = [
@@ -517,6 +519,7 @@ function App() {
   const [loadingEvents, setLoadingEvents] = useState(true);
   const [liveAtc, setLiveAtc] = useState([]);
   const [loadingLiveAtc, setLoadingLiveAtc] = useState(true);
+  const [aircraft, setAircraft] = useState([]);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [openPlan, setOpenPlan] = useState(null);
 
@@ -587,6 +590,20 @@ function App() {
           }))
           .sort((a, b) => (b.start || 0) - (a.start || 0));
         setLiveAtc(filtered);
+
+        const pilots = payload.pilots || [];
+        const inRange = pilots
+          .filter(p => typeof p.latitude === 'number' && typeof p.longitude === 'number')
+          .filter(p => inView(p.latitude, p.longitude))
+          .map(p => ({
+            callsign: p.callsign,
+            lat: p.latitude,
+            lon: p.longitude,
+            alt: p.altitude,
+            gs: p.groundspeed,
+            hdg: p.heading
+          }));
+        setAircraft(inRange);
       } catch (err) {
         if (err.name !== 'AbortError') console.error(err);
       } finally {
@@ -595,7 +612,11 @@ function App() {
     };
 
     loadLiveAtc();
-    return () => controller.abort();
+    const interval = setInterval(loadLiveAtc, 60000);
+    return () => {
+      controller.abort();
+      clearInterval(interval);
+    };
   }, []);
 
   useEffect(() => {
@@ -806,31 +827,57 @@ function App() {
       <TopNav mobileOpen={mobileOpen} setMobileOpen={setMobileOpen} />
 
       <section className="hero">
-        <div className="hero-overlay" />
-        <Motion.div
-          className="hero-content"
-          initial={{ opacity: 0, y: 24 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, ease: 'easeOut' }}
-        >
-          <h2 className="hero-welcome">Welcome to the</h2>
-          <h1 className="hero-title">Arabian vACC</h1>
-          <p className="hero-sub">
-            Explore the virtual skies of the U.A.E, Qatar and Oman with Arabian vACC on VATSIM.
-            Experience realistic air traffic control and piloting with our community.
-          </p>
-          <div className="hero-actions">
-            <a
-              className="btn btn-primary"
-              href="/controllers/join"
-            >
-              Join Now
-            </a>
-            <a className="btn btn-ghost" href="https://library.vatsim-arabian.com">
-              Explore Library
-            </a>
-          </div>
-        </Motion.div>
+        <div className="hero-grid" aria-hidden="true" />
+        <div className="hero-glow" aria-hidden="true" />
+        <div className="hero-inner">
+          <Motion.div
+            className="hero-content"
+            initial={{ opacity: 0, y: 24 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, ease: 'easeOut' }}
+          >
+            <span className="hero-eyebrow">VATSIM · Middle East &amp; North Africa</span>
+            <h2 className="hero-welcome">Welcome to the</h2>
+            <h1 className="hero-title">Arabian vACC</h1>
+            <p className="hero-sub">
+              Explore the virtual skies of the U.A.E, Qatar and Oman with Arabian vACC on VATSIM.
+              Experience realistic air traffic control and piloting with our community.
+            </p>
+            <div className="hero-actions">
+              <a className="btn btn-primary" href="/controllers/join">
+                Join Now
+              </a>
+              <a className="btn btn-ghost" href="https://library.vatsim-arabian.com">
+                Explore Library
+              </a>
+            </div>
+            <div className="hero-stats">
+              <span className="stat-live">
+                <span className="stat-live-dot" aria-hidden="true" />
+                LIVE
+              </span>
+              <div className="stat">
+                <strong>{aircraft.length}</strong>
+                <span>{aircraft.length === 1 ? 'aircraft in FIR' : 'aircraft in FIR'}</span>
+              </div>
+              <div className="stat-divider" aria-hidden="true" />
+              <div className="stat">
+                <strong>{liveAtc.length}</strong>
+                <span>{liveAtc.length === 1 ? 'position online' : 'positions online'}</span>
+              </div>
+            </div>
+          </Motion.div>
+
+          <Motion.div
+            className="hero-radar"
+            initial={{ opacity: 0, scale: 0.96 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 1.1, ease: 'easeOut', delay: 0.15 }}
+          >
+            <SectorMap aircraft={aircraft} />
+            <div className="radar-caption">EMIRATES FIR · OMAE · LIVE TRAFFIC</div>
+          </Motion.div>
+        </div>
       </section>
 
       <section className="events" id="events">
