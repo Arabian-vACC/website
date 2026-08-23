@@ -1,6 +1,6 @@
 export default async function handler(req, res) {
   const key = (process.env.ROSTER_API_KEY || "").trim();
-  const url = process.env.HQ_ROSTER_URL || "https://hq.vatsim.me/api/public/roster";
+  const url = process.env.HQ_ROSTER_URL || "https://api.vatsim.me/v1/vaccs/ARB/roster";
 
   if (!key) {
     res.status(503).json({ error: "Roster key not configured. Set ROSTER_API_KEY in the Vercel environment." });
@@ -8,7 +8,7 @@ export default async function handler(req, res) {
   }
 
   try {
-    const upstream = await fetch(url, { headers: { "X-API-Key": key } });
+    const upstream = await fetch(url, { headers: { Authorization: `Bearer ${key}` } });
     if (!upstream.ok) {
       res.status(upstream.status).json({ error: `HQ roster request failed (${upstream.status})` });
       return;
