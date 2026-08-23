@@ -10,7 +10,16 @@ export default async function handler(req, res) {
   try {
     const upstream = await fetch(url, { headers: { Authorization: `Bearer ${key}` } });
     if (!upstream.ok) {
-      res.status(upstream.status).json({ error: `HQ roster request failed (${upstream.status})` });
+      const upstreamBody = await upstream.text().catch(() => "");
+      res.status(upstream.status).json({
+        error: `HQ roster request failed (${upstream.status})`,
+        debug: {
+          url,
+          keyPreview: `${key.slice(0, 12)}…${key.slice(-4)}`,
+          keyLength: key.length,
+          upstreamBody: upstreamBody.slice(0, 300),
+        },
+      });
       return;
     }
     const data = await upstream.json();
