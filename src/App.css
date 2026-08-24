@@ -1422,17 +1422,21 @@ h1, h2, h3, h4 {
   border-color: rgba(250, 172, 2, 0.4);
 }
 
-.solo-badge {
-  margin-left: 8px;
-  font-size: 10px;
-  font-weight: 700;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  padding: 2px 8px;
-  border-radius: 999px;
+.pos-badge.pos-solo {
   background: var(--accent-soft);
   color: var(--accent);
-  border: 1px solid rgba(250, 172, 2, 0.4);
-  white-space: nowrap;
-  vertical-align: middle;
+  border-color: rgba(250, 172, 2, 0.65);
+  animation: soloPulse 1.8s ease-in-out infinite;
+}
+
+@keyframes soloPulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(250, 172, 2, 0); }
+  50%      { box-shadow: 0 0 9px 2px rgba(250, 172, 2, 0.6); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pos-badge.pos-solo {
+    animation: none;
+    box-shadow: 0 0 7px 1px rgba(250, 172, 2, 0.45);
+  }
 }

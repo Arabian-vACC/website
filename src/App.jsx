@@ -162,17 +162,19 @@ function RosterTable({ rows }) {
           <tr><td colSpan={4} className="roster-empty">No controllers listed.</td></tr>
         ) : rows.map(c => (
           <tr key={c.cid}>
-            <td>
-              {c.name || '—'}
-              {soloLabel(c) ? <span className="solo-badge">{soloLabel(c)}</span> : null}
-            </td>
+            <td>{c.name || '—'}</td>
             <td>{c.cid}</td>
             <td>{c.rating || '—'}</td>
             <td>
               <div className="pos-badges">
-                {ROSTER_POSITIONS.map(p => (
-                  <span key={p} className={`pos-badge${c.positions?.includes(p) ? ' pos-on' : ''}`}>{p}</span>
-                ))}
+                {ROSTER_POSITIONS.map(p => {
+                  const approved = c.positions?.includes(p);
+                  const solo = Array.isArray(c.solo) && c.solo.includes(p);
+                  const cls = approved ? 'pos-badge pos-on' : solo ? 'pos-badge pos-solo' : 'pos-badge';
+                  return (
+                    <span key={p} className={cls} title={solo ? 'Solo endorsement' : undefined}>{p}</span>
+                  );
+                })}
               </div>
             </td>
           </tr>
