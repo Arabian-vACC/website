@@ -90,6 +90,12 @@ export default async function handler(req, res) {
     const data = await upstream.json();
     const code = vaccCode();
 
+    if (req.query && (req.query.debug === "1" || req.query.debug === "true")) {
+      res.setHeader("Cache-Control", "no-store");
+      res.status(200).json({ _debug: true, url, upstreamStatus: upstream.status, data });
+      return;
+    }
+
     const { month, year, all } = normalizeVaccs(data);
     const totalVaccs = all.length || null;
     const wantName = process.env.HQ_VACC_NAME || "Arabian vACC";
