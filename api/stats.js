@@ -29,6 +29,7 @@ function normalizeVaccs(data) {
   let month = null;
   let year = null;
   const all = [];
+  if (!data || typeof data !== "object") return { month, year, all };
 
   const months = Array.isArray(data.months) ? data.months : [];
   if (months.length) {
@@ -67,6 +68,22 @@ function normalizeVaccs(data) {
   return { month, year, all: [...byVacc.values()] };
 }
 
+async function fetchNormalized(url, headers) {
+  try {
+    const upstream = await fetch(url, { headers });
+    if (!upstream.ok) return null;
+    const data = await upstream.json().catch(() => null);
+    return normalizeVaccs(data);
+  } catch {
+    return null;
+  }
+}
+
+function currentMonthUtc() {
+  const d = new Date();
+  return `${d.getUTCFullYear()}-${String(d.getUTCMonth() + 1).padStart(2, "0")}`;
+}
+
 export default async function handler(req, res) {
   const key = (process.env.ROSTER_API_KEY || "").trim();
   if (!key) {
@@ -74,31 +91,32 @@ export default async function handler(req, res) {
     return;
   }
 
-  const url = `${apiBase()}/stats/monthly?limit=1`;
-  const headers = {
+  const code = vaccCode();
+  const wantName = process.env.HQ_VACC_NAME || "Arabian vACC";
+
+  const v1Url = `${apiBase()}/stats/monthly?limit=1`;
+  const v1Headers = {
     Authorization: `Bearer ${key}`,
     Accept: "application/json",
     "User-Agent": "vatsim-arabian.com stats proxy (+https://vatsim-arabian.com)",
   };
 
   try {
-    const upstream = await fetch(url, { headers });
-    if (!upstream.ok) {
-      res.status(upstream.status).json({ error: `HQ stats request failed (${upstream.status})` });
-      return;
-    }
-    const data = await upstream.json();
-    const code = vaccCode();
+    let norm = await fetchNormalized(v1Url, v1Headers);
 
-    if (req.query && (req.query.debug === "1" || req.query.debug === "true")) {
-      res.setHeader("Cache-Control", "no-store");
-      res.status(200).json({ _debug: true, url, upstreamStatus: upstream.status, data });
-      return;
+    if (!norm || !norm.all.length) {
+      const fallbackBase =
+        process.env.HQ_STATS_FALLBACK_URL || "https://hq.vatsim.me/api/stats/monthly";
+      const fallbackUrl = `${fallbackBase}?month=${currentMonthUtc()}`;
+      const fb = await fetchNormalized(fallbackUrl, {
+        Accept: "application/json",
+        "User-Agent": "vatsim-arabian.com stats proxy (+https://vatsim-arabian.com)",
+      });
+      if (fb && fb.all.length) norm = fb;
     }
 
-    const { month, year, all } = normalizeVaccs(data);
+    const { month, year, all } = norm || { month: null, year: null, all: [] };
     const totalVaccs = all.length || null;
-    const wantName = process.env.HQ_VACC_NAME || "Arabian vACC";
     const mine =
       all.find((v) => v.code && v.code === code) ||
       all.find((v) => canonVaccName(v.name) === canonVaccName(wantName)) ||
