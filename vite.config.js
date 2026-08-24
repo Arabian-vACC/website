@@ -25,6 +25,11 @@ export default defineConfig({
         target: 'https://my.vatsim.net',
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/api\/events/, '/api/v2/events/view/division/MENA')
+      },
+      '/api/stats': {
+        target: 'https://vatsim-arabian.com',
+        changeOrigin: true,
+        secure: true
       }
     }
   }
