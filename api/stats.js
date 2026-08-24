@@ -20,6 +20,53 @@ function canonVaccName(input) {
     .trim();
 }
 
+function addFacility(facilities, label, hours) {
+  if (!label) return;
+  facilities[label] = (facilities[label] || 0) + (Number(hours) || 0);
+}
+
+function normalizeVaccs(data) {
+  let month = null;
+  let year = null;
+  const all = [];
+
+  const months = Array.isArray(data.months) ? data.months : [];
+  if (months.length) {
+    const m = months[0] || {};
+    month = m.month || null;
+    year = m.year || (month ? Number(String(month).slice(0, 4)) : null);
+
+    for (const v of Array.isArray(m.vaccs) ? m.vaccs : []) {
+      const facilities = {};
+      for (const f of Array.isArray(v.facilities) ? v.facilities : []) {
+        addFacility(facilities, String(f?.name || "").toUpperCase(), f?.hours);
+      }
+      all.push({
+        name: v.name || v.code || "",
+        code: String(v.code || "").toUpperCase(),
+        totalHours: Number(v.totalHours) || 0,
+        facilities,
+      });
+    }
+    return { month, year, all };
+  }
+
+  month = data.month || null;
+  year = month ? Number(String(month).slice(0, 4)) : null;
+
+  const byVacc = new Map();
+  for (const row of Array.isArray(data.stats) ? data.stats : []) {
+    const name = String(row.vacc || "").trim();
+    if (!name) continue;
+    if (!byVacc.has(name)) byVacc.set(name, { name, code: "", totalHours: 0, facilities: {} });
+    const entry = byVacc.get(name);
+    const hours = Number(row.totalHours) || 0;
+    entry.totalHours += hours;
+    addFacility(entry.facilities, FACILITY_LABELS[Number(row.facility)], hours);
+  }
+  return { month, year, all: [...byVacc.values()] };
+}
+
 export default async function handler(req, res) {
   const key = (process.env.ROSTER_API_KEY || "").trim();
   if (!key) {
@@ -27,7 +74,7 @@ export default async function handler(req, res) {
     return;
   }
 
-  const url = `${apiBase()}/stats/monthly`;
+  const url = `${apiBase()}/stats/monthly?limit=1`;
   const headers = {
     Authorization: `Bearer ${key}`,
     Accept: "application/json",
@@ -43,24 +90,13 @@ export default async function handler(req, res) {
     const data = await upstream.json();
     const code = vaccCode();
 
-    const rows = Array.isArray(data.stats) ? data.stats : [];
-    const byVacc = new Map();
-    for (const row of rows) {
-      const name = String(row.vacc || "").trim();
-      if (!name) continue;
-      if (!byVacc.has(name)) byVacc.set(name, { name, totalHours: 0, facilities: {} });
-      const entry = byVacc.get(name);
-      const hours = Number(row.totalHours) || 0;
-      entry.totalHours += hours;
-      const label = FACILITY_LABELS[Number(row.facility)];
-      if (label) entry.facilities[label] = (entry.facilities[label] || 0) + hours;
-    }
-
-    const all = [...byVacc.values()];
+    const { month, year, all } = normalizeVaccs(data);
     const totalVaccs = all.length || null;
     const wantName = process.env.HQ_VACC_NAME || "Arabian vACC";
     const mine =
-      all.find((v) => canonVaccName(v.name) === canonVaccName(wantName)) || null;
+      all.find((v) => v.code && v.code === code) ||
+      all.find((v) => canonVaccName(v.name) === canonVaccName(wantName)) ||
+      null;
 
     let rank = null;
     if (mine) {
@@ -71,10 +107,10 @@ export default async function handler(req, res) {
 
     res.setHeader("Cache-Control", "public, s-maxage=900, stale-while-revalidate=1800");
     res.status(200).json({
-      month: data.month || null,
-      year: data.month ? Number(String(data.month).slice(0, 4)) : null,
+      month,
+      year,
       code,
-      name: mine?.name || "Arabian vACC",
+      name: mine?.name || wantName,
       totalHours: mine?.totalHours ?? 0,
       facilities: mine
         ? Object.entries(mine.facilities).map(([name, hours]) => ({ name, hours }))
