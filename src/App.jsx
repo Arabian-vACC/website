@@ -137,6 +137,15 @@ const inductionPlans = [
 
 const ROSTER_POSITIONS = ['DEL', 'GND', 'TWR', 'APP', 'CTR'];
 
+const hasApproval = (c) => Array.isArray(c.positions) && c.positions.length > 0;
+
+function soloLabel(c) {
+  const s = c?.solo;
+  if (!s) return null;
+  if (Array.isArray(s)) return s.length ? `Solo · ${s.join(', ')}` : null;
+  return 'Solo';
+}
+
 function RosterTable({ rows }) {
   return (
     <table className="staff-table roster-table">
@@ -153,7 +162,10 @@ function RosterTable({ rows }) {
           <tr><td colSpan={4} className="roster-empty">No controllers listed.</td></tr>
         ) : rows.map(c => (
           <tr key={c.cid}>
-            <td>{c.name || '—'}</td>
+            <td>
+              {c.name || '—'}
+              {soloLabel(c) ? <span className="solo-badge">{soloLabel(c)}</span> : null}
+            </td>
             <td>{c.cid}</td>
             <td>{c.rating || '—'}</td>
             <td>
@@ -659,9 +671,9 @@ function App() {
               <p className="roster-status">{rosterError}</p>
             ) : (
               <>
-                <RosterTable rows={roster?.home || []} />
+                <RosterTable rows={(roster?.home || []).filter(hasApproval)} />
                 <h2 className="vacancies-heading">Visiting Controllers</h2>
-                <RosterTable rows={roster?.visiting || []} />
+                <RosterTable rows={(roster?.visiting || []).filter(hasApproval)} />
               </>
             )}
           </div>
