@@ -4,19 +4,17 @@ import SectorMap from './SectorMap.jsx';
 import { inView } from './mapGeo.js';
 import './App.css';
 
-const TARGET_ICAOS = [
-  'OMAA',
-  'OMAL',
-  'OMAD',
-  'OMDW',
-  'OMDL',
-  'OMDB',
-  'OMFJ',
-  'OOMS',
-  'OMRK',
-  'OOSA',
-  'OMSJ'
-];
+const ARABIAN_PREFIXES = ['OM', 'OO'];
+const positionPrefix = (cs) => String(cs || '').trim().slice(0, 2).toUpperCase();
+const isArabianEvent = (ev) => {
+  const signals = [ev.departure, ev.arrival, ...(ev.atcPositions || [])];
+  return signals.some((s) => ARABIAN_PREFIXES.includes(positionPrefix(s)));
+};
+const absolutizeHqUrl = (u) => {
+  if (!u) return null;
+  if (/^https?:\/\//.test(u)) return u;
+  return `https://hq.vatsim.me${u.startsWith('/') ? '' : '/'}${u}`;
+};
 
 const formatTime = (date) => {
   if (!date) return '—';
@@ -172,7 +170,9 @@ function RosterTable({ rows }) {
                   const solo = Array.isArray(c.solo) && c.solo.includes(p);
                   const cls = approved ? 'pos-badge pos-on' : solo ? 'pos-badge pos-solo' : 'pos-badge';
                   return (
-                    <span key={p} className={cls} title={solo ? 'Solo endorsement' : undefined}>{p}</span>
+                    <span key={p} className={cls} title={solo ? 'Solo endorsement' : undefined}>
+                      {solo ? `${p} Solo` : p}
+                    </span>
                   );
                 })}
               </div>
@@ -520,6 +520,76 @@ function ExternalTransferPlan() {
   );
 }
 
+const FACILITY_ORDER = ['DEL', 'GND', 'TWR', 'APP', 'CTR'];
+
+function fmtHours(h) {
+  const n = Number(h) || 0;
+  return n >= 100 ? String(Math.round(n)) : n.toFixed(1);
+}
+
+function formatMonthLabel(month) {
+  if (!month) return '';
+  const m = String(month);
+  const ym = m.match(/^(\d{4})-(\d{2})$/);
+  if (ym) {
+    const d = new Date(Date.UTC(Number(ym[1]), Number(ym[2]) - 1, 1));
+    return d.toLocaleString('en-GB', { month: 'long', year: 'numeric', timeZone: 'UTC' });
+  }
+  return m;
+}
+
+function StatsStrip({ stats, loading }) {
+  if (loading) {
+    return (
+      <section className="stats-strip" aria-hidden="true">
+        <div className="stats-strip-inner">
+          <div className="stats-strip-lead">
+            <span className="stats-strip-skel stats-strip-skel-lead" />
+          </div>
+          <div className="stats-chips">
+            {FACILITY_ORDER.map(f => <span key={f} className="stats-strip-skel stat-chip-skel" />)}
+            <span className="stats-strip-skel stat-chip-skel" />
+          </div>
+        </div>
+      </section>
+    );
+  }
+
+  if (!stats || !stats.month) return null;
+
+  const byName = {};
+  for (const f of stats.facilities || []) byName[String(f.name).toUpperCase()] = f.hours;
+
+  return (
+    <section className="stats-strip" aria-label="Monthly controlling hours">
+      <div className="stats-strip-inner">
+        <div className="stats-strip-lead">
+          <span className="stats-strip-eyebrow">Monthly Activity</span>
+          <span className="stats-strip-month">{formatMonthLabel(stats.month)}</span>
+        </div>
+        <div className="stats-chips">
+          {FACILITY_ORDER.map(f => (
+            <div className="stat-chip" key={f}>
+              <span className="stat-chip-label">{f}</span>
+              <span className="stat-chip-value">{fmtHours(byName[f])}<i>h</i></span>
+            </div>
+          ))}
+          <div className="stat-chip stat-chip-total">
+            <span className="stat-chip-label">Total</span>
+            <span className="stat-chip-value">{fmtHours(stats.totalHours)}<i>h</i></span>
+          </div>
+          {stats.rank && stats.totalVaccs ? (
+            <div className="stat-chip stat-chip-rank">
+              <span className="stat-chip-label">MENA Rank</span>
+              <span className="stat-chip-value">#{stats.rank}<i>/{stats.totalVaccs}</i></span>
+            </div>
+          ) : null}
+        </div>
+      </div>
+    </section>
+  );
+}
+
 function App() {
   const partnerLogos = [
     { name: 'Qatar', file: 'qatar.png', url: 'https://mynextairline.com/airlines/oryx-virtual', size: 'wide' },
@@ -541,6 +611,9 @@ function App() {
   const [loadingRoster, setLoadingRoster] = useState(true);
   const [rosterError, setRosterError] = useState('');
 
+  const [stats, setStats] = useState(null);
+  const [loadingStats, setLoadingStats] = useState(true);
+
   const isStaffPage =
     typeof window !== 'undefined' && window.location.pathname.toLowerCase().includes('staff');
   const isRosterPage =
@@ -558,21 +631,20 @@ function App() {
       try {
         const res = await fetch('/api/events', { signal: controller.signal });
         if (!res.ok) throw new Error(`Events request failed (${res.status})`);
-        const { data } = await res.json();
-        const filtered = data
-          .filter(event =>
-            event.airports?.some(airport => TARGET_ICAOS.includes(airport.icao))
-          )
+        const payload = await res.json();
+        const list = Array.isArray(payload.events) ? payload.events : [];
+        const filtered = list
+          .filter(isArabianEvent)
           .map(event => ({
             id: event.id,
-            name: event.name,
-            start: event.start_time,
-            end: event.end_time,
-            banner: event.banner,
-            link: event.link,
-            airports: event.airports?.map(a => a.icao).join(', ')
+            name: event.title,
+            start: event.startIso || null,
+            end: event.endIso || null,
+            banner: absolutizeHqUrl(event.imageUrl),
+            positions: Array.isArray(event.atcPositions) ? event.atcPositions : [],
+            airports: [event.departure, event.arrival].filter(Boolean).join(' → ')
           }))
-          .sort((a, b) => new Date(a.start) - new Date(b.start));
+          .sort((a, b) => new Date(a.start || 0) - new Date(b.start || 0));
         setEvents(filtered);
       } catch (err) {
         if (err.name !== 'AbortError') console.error(err);
@@ -587,13 +659,31 @@ function App() {
 
   useEffect(() => {
     const controller = new AbortController();
+    const loadStats = async () => {
+      try {
+        const res = await fetch('/api/stats', { signal: controller.signal });
+        if (!res.ok) throw new Error(`Stats request failed (${res.status})`);
+        setStats(await res.json());
+      } catch (err) {
+        if (err.name !== 'AbortError') console.error(err);
+      } finally {
+        setLoadingStats(false);
+      }
+    };
+
+    loadStats();
+    return () => controller.abort();
+  }, []);
+
+  useEffect(() => {
+    const controller = new AbortController();
     const loadLiveAtc = async () => {
       try {
         const res = await fetch('/api/data', { signal: controller.signal });
         if (!res.ok) throw new Error(`Live ATC request failed (${res.status})`);
         const payload = await res.json();
         const controllers = payload.controllers || [];
-        const callsignMatcher = /^((OM|OT|OO)[A-Z0-9]{2,}_|DOH)/;
+        const callsignMatcher = /^(OM|OO)[A-Z0-9]{2,}_/;
         const filtered = controllers
           .filter(ctrl => callsignMatcher.test(ctrl.callsign || ''))
           .map(ctrl => ({
@@ -751,7 +841,7 @@ function App() {
           <div className="staff-heading">
             <span className="eyebrow">Controllers</span>
             <h1>Become a Controller</h1>
-            <p>Join the Arabian vACC and control the virtual skies of the U.A.E, Qatar and Oman on VATSIM.</p>
+            <p>Join the Arabian vACC and control the virtual skies of the U.A.E and Oman on VATSIM.</p>
           </div>
 
           <section className="join-section">
@@ -840,6 +930,8 @@ function App() {
     <div className="page">
       <TopNav mobileOpen={mobileOpen} setMobileOpen={setMobileOpen} />
 
+      <StatsStrip stats={stats} loading={loadingStats} />
+
       <section className="hero">
         <div className="hero-grid" aria-hidden="true" />
         <div className="hero-glow" aria-hidden="true" />
@@ -854,7 +946,7 @@ function App() {
             <h2 className="hero-welcome">Welcome to the</h2>
             <h1 className="hero-title">Arabian vACC</h1>
             <p className="hero-sub">
-              Explore the virtual skies of the U.A.E, Qatar and Oman with Arabian vACC on VATSIM.
+              Explore the virtual skies of the U.A.E and Oman with Arabian vACC on VATSIM.
               Experience realistic air traffic control and piloting with our community.
             </p>
             <div className="hero-actions">
@@ -942,11 +1034,24 @@ function App() {
                 </div>
                 <h3 className="event-name">{event.name}</h3>
                 <p className="event-date">{formatEventRange(event.start, event.end)}</p>
-                {event.link && (
-                  <a className="event-info" href={event.link} target="_blank" rel="noreferrer">
-                    View Info <span aria-hidden="true">→</span>
-                  </a>
+                {event.positions.length > 0 && (
+                  <div className="event-positions">
+                    <div className="event-positions-head">
+                      <span className="event-positions-label">ATC Positions</span>
+                      <span className="event-positions-count">
+                        {event.positions.length} {event.positions.length === 1 ? 'position' : 'positions'}
+                      </span>
+                    </div>
+                    <div className="event-positions-list">
+                      {event.positions.map(p => (
+                        <span key={p} className="event-pos">{p}</span>
+                      ))}
+                    </div>
+                  </div>
                 )}
+                <a className="event-book" href="https://hq.vatsim.me" target="_blank" rel="noreferrer">
+                  Book ATC <span aria-hidden="true">→</span>
+                </a>
               </div>
             </Motion.article>
           ))}

@@ -11,10 +11,6 @@
       "destination": "https://atc-bookings.vatsim.net/api/booking"
     },
     {
-      "source": "/api/events(.*)",
-      "destination": "https://my.vatsim.net/api/v2/events/latest"
-    },
-    {
       "source": "/(.*)",
       "destination": "/index.html"
     }
