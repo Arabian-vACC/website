@@ -137,7 +137,7 @@ const inductionPlans = [
 
 const ROSTER_POSITIONS = ['DEL', 'GND', 'TWR', 'APP', 'CTR'];
 
-const hasApproval = (c) => Array.isArray(c.positions) && c.positions.length > 0;
+const hasApproval = (c) => (Array.isArray(c.positions) && c.positions.length > 0) || !!soloLabel(c);
 
 function soloLabel(c) {
   const s = c?.solo;

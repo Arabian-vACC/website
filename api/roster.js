@@ -7,50 +7,49 @@ export default async function handler(req, res) {
     return;
   }
 
+  const headers = {
+    Authorization: `Bearer ${key}`,
+    Accept: "application/json",
+    "User-Agent": "vatsim-arabian.com roster proxy (+https://vatsim-arabian.com)",
+  };
+
+  const solosUrl = url.replace(/\/roster(\?|$)/, "/solos$1");
+
   try {
-    console.log(`[roster] → GET ${url}  (key ${key.slice(0, 12)}…${key.slice(-4)}, len ${key.length})`);
-    const upstream = await fetch(url, {
-      headers: {
-        Authorization: `Bearer ${key}`,
-        Accept: "application/json",
-        "User-Agent": "vatsim-arabian.com roster proxy (+https://vatsim-arabian.com)",
-      },
-    });
+    const [rosterRes, solosRes] = await Promise.all([
+      fetch(url, { headers }),
+      fetch(solosUrl, { headers }).catch(() => null),
+    ]);
 
-    const bodyText = await upstream.text();
-    const headers = Object.fromEntries(upstream.headers.entries());
-    console.log(`[roster] ← ${upstream.status} ${upstream.statusText}`);
-    console.log(`[roster] response headers: ${JSON.stringify(headers)}`);
-    console.log(`[roster] response body (first 2000 chars): ${bodyText.slice(0, 2000)}`);
-
-    if (!upstream.ok) {
-      res.status(upstream.status).json({
-        error: `HQ roster request failed (${upstream.status})`,
-        debug: {
-          url,
-          keyPreview: `${key.slice(0, 12)}…${key.slice(-4)}`,
-          keyLength: key.length,
-          cfMitigated: headers["cf-mitigated"] || null,
-          cfRay: headers["cf-ray"] || null,
-          server: headers["server"] || null,
-          upstreamBody: bodyText.slice(0, 300),
-        },
-      });
+    if (!rosterRes.ok) {
+      res.status(rosterRes.status).json({ error: `HQ roster request failed (${rosterRes.status})` });
       return;
     }
 
-    let data;
-    try {
-      data = JSON.parse(bodyText);
-    } catch (e) {
-      console.error(`[roster] JSON parse failed: ${e.message}`);
-      res.status(502).json({ error: "HQ roster API returned non-JSON." });
-      return;
+    const roster = await rosterRes.json();
+    if (solosRes && solosRes.ok) {
+      try {
+        const solosData = await solosRes.json();
+        const soloByCid = {};
+        for (const s of solosData.solos || []) {
+          const cid = String(s.cid || "").trim();
+          if (!cid) continue;
+          const pos = String(s.position || "").split("_").pop() || "Solo";
+          (soloByCid[cid] ||= []).push(pos);
+        }
+        const applySolo = (arr) =>
+          Array.isArray(arr)
+            ? arr.map((c) => (soloByCid[String(c.cid)] ? { ...c, solo: soloByCid[String(c.cid)] } : c))
+            : arr;
+        roster.home = applySolo(roster.home);
+        roster.visiting = applySolo(roster.visiting);
+      } catch {
+      }
     }
+
     res.setHeader("Cache-Control", "public, s-maxage=300, stale-while-revalidate=600");
-    res.status(200).json(data);
-  } catch (err) {
-    console.error(`[roster] fetch threw: ${err?.message || err}`);
+    res.status(200).json(roster);
+  } catch {
     res.status(502).json({ error: "Failed to reach HQ roster API." });
   }
 }
