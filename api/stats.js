@@ -10,6 +10,16 @@ function vaccCode() {
   return (m ? m[1] : "ARB").toUpperCase();
 }
 
+const FACILITY_LABELS = { 1: "DEL", 2: "GND", 3: "TWR", 4: "APP", 5: "CTR" };
+
+function canonVaccName(input) {
+  return String(input || "")
+    .toLowerCase()
+    .replace(/\bvacc\b/g, " ")
+    .replace(/[^a-z0-9]+/g, " ")
+    .trim();
+}
+
 export default async function handler(req, res) {
   const key = (process.env.ROSTER_API_KEY || "").trim();
   if (!key) {
@@ -17,7 +27,7 @@ export default async function handler(req, res) {
     return;
   }
 
-  const url = `${apiBase()}/stats/monthly?limit=1`;
+  const url = `${apiBase()}/stats/monthly`;
   const headers = {
     Authorization: `Bearer ${key}`,
     Accept: "application/json",
@@ -32,26 +42,43 @@ export default async function handler(req, res) {
     }
     const data = await upstream.json();
     const code = vaccCode();
-    const month = (data.months || [])[0] || null;
-    const vaccs = month && Array.isArray(month.vaccs) ? month.vaccs : [];
-    const mine = vaccs.find((v) => String(v.code).toUpperCase() === code) || null;
+
+    const rows = Array.isArray(data.stats) ? data.stats : [];
+    const byVacc = new Map();
+    for (const row of rows) {
+      const name = String(row.vacc || "").trim();
+      if (!name) continue;
+      if (!byVacc.has(name)) byVacc.set(name, { name, totalHours: 0, facilities: {} });
+      const entry = byVacc.get(name);
+      const hours = Number(row.totalHours) || 0;
+      entry.totalHours += hours;
+      const label = FACILITY_LABELS[Number(row.facility)];
+      if (label) entry.facilities[label] = (entry.facilities[label] || 0) + hours;
+    }
+
+    const all = [...byVacc.values()];
+    const totalVaccs = all.length || null;
+    const wantName = process.env.HQ_VACC_NAME || "Arabian vACC";
+    const mine =
+      all.find((v) => canonVaccName(v.name) === canonVaccName(wantName)) || null;
 
     let rank = null;
-    const totalVaccs = vaccs.length || null;
-    if (vaccs.length) {
-      const sorted = [...vaccs].sort((a, b) => (b.totalHours || 0) - (a.totalHours || 0));
-      const idx = sorted.findIndex((v) => String(v.code).toUpperCase() === code);
+    if (mine) {
+      const sorted = [...all].sort((a, b) => b.totalHours - a.totalHours);
+      const idx = sorted.indexOf(mine);
       rank = idx >= 0 ? idx + 1 : null;
     }
 
     res.setHeader("Cache-Control", "public, s-maxage=900, stale-while-revalidate=1800");
     res.status(200).json({
-      month: month?.month || null,
-      year: month?.year || null,
+      month: data.month || null,
+      year: data.month ? Number(String(data.month).slice(0, 4)) : null,
       code,
       name: mine?.name || "Arabian vACC",
       totalHours: mine?.totalHours ?? 0,
-      facilities: Array.isArray(mine?.facilities) ? mine.facilities : [],
+      facilities: mine
+        ? Object.entries(mine.facilities).map(([name, hours]) => ({ name, hours }))
+        : [],
       rank,
       totalVaccs,
     });
