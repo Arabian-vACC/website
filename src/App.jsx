@@ -145,6 +145,9 @@ function soloLabel(c) {
 }
 
 function RosterTable({ rows }) {
+  const sorted = [...rows].sort((a, b) =>
+    String(a.name || '').localeCompare(String(b.name || ''), 'en', { sensitivity: 'base' })
+  );
   return (
     <table className="staff-table roster-table">
       <thead>
@@ -156,9 +159,9 @@ function RosterTable({ rows }) {
         </tr>
       </thead>
       <tbody>
-        {rows.length === 0 ? (
+        {sorted.length === 0 ? (
           <tr><td colSpan={4} className="roster-empty">No controllers listed.</td></tr>
-        ) : rows.map(c => (
+        ) : sorted.map(c => (
           <tr key={c.cid}>
             <td>{c.name || '—'}</td>
             <td>{c.cid}</td>
