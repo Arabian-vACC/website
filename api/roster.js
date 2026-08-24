@@ -8,7 +8,13 @@ export default async function handler(req, res) {
   }
 
   try {
-    const upstream = await fetch(url, { headers: { Authorization: `Bearer ${key}` } });
+    const upstream = await fetch(url, {
+      headers: {
+        Authorization: `Bearer ${key}`,
+        Accept: "application/json",
+        "User-Agent": "vatsim-arabian.com roster proxy (+https://vatsim-arabian.com)",
+      },
+    });
     if (!upstream.ok) {
       const upstreamBody = await upstream.text().catch(() => "");
       res.status(upstream.status).json({
