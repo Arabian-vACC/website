@@ -251,12 +251,70 @@ h1, h2, h3, h4 {
 .hero-radar {
   position: relative;
   display: flex;
-  align-items: center;
-  justify-content: center;
-  aspect-ratio: 1.28;
+  flex-direction: column;
+  align-items: stretch;
   width: 100%;
   max-width: 940px;
   margin-left: auto;
+}
+
+.radar-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-bottom: 0.7rem;
+  justify-content: flex-end;
+}
+
+.radar-tab {
+  position: relative;
+  overflow: hidden;
+  appearance: none;
+  border: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.02);
+  color: var(--text-gray);
+  font-family: inherit;
+  font-size: 0.66rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 0.4rem 0.7rem;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: color 0.2s ease, border-color 0.2s ease, background 0.2s ease;
+}
+
+.radar-tab:hover {
+  color: var(--text-white);
+  border-color: rgba(250, 172, 2, 0.4);
+}
+
+.radar-tab.is-active {
+  color: var(--accent);
+  border-color: rgba(250, 172, 2, 0.65);
+  background: rgba(250, 172, 2, 0.08);
+}
+
+.radar-tab-progress {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  height: 2px;
+  width: 100%;
+  transform-origin: left center;
+  background: var(--accent);
+  animation: radarProgress 6.5s linear forwards;
+}
+
+@keyframes radarProgress {
+  from { transform: scaleX(0); }
+  to { transform: scaleX(1); }
+}
+
+.sectormap-stage {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1.28;
 }
 
 .sectormap-wrap {
@@ -302,10 +360,8 @@ h1, h2, h3, h4 {
 }
 
 .radar-caption {
-  position: absolute;
-  bottom: -0.2rem;
-  left: 50%;
-  transform: translateX(-50%);
+  margin-top: 0.7rem;
+  text-align: center;
   font-size: 0.62rem;
   letter-spacing: 0.28em;
   color: rgba(250, 172, 2, 0.55);
@@ -381,8 +437,11 @@ h1, h2, h3, h4 {
   }
   .hero-radar {
     order: -1;
-    max-width: 360px;
+    max-width: 420px;
     margin: 0 auto;
+  }
+  .radar-tabs {
+    justify-content: center;
   }
   .hero-stats {
     justify-content: center;

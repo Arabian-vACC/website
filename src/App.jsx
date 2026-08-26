@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { motion as Motion } from 'framer-motion';
 import SectorMap from './SectorMap.jsx';
-import { inView } from './mapGeo.js';
+import { inRegion, RADAR_VIEWS } from './mapGeo.js';
 import './App.css';
 
 const ARABIAN_PREFIXES = ['OM', 'OO'];
@@ -607,6 +607,8 @@ function App() {
   const [liveAtc, setLiveAtc] = useState([]);
   const [loadingLiveAtc, setLoadingLiveAtc] = useState(true);
   const [aircraft, setAircraft] = useState([]);
+  const [radarView, setRadarView] = useState(0);
+  const [radarPaused, setRadarPaused] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [openPlan, setOpenPlan] = useState(null);
 
@@ -701,7 +703,7 @@ function App() {
         const pilots = payload.pilots || [];
         const inRange = pilots
           .filter(p => typeof p.latitude === 'number' && typeof p.longitude === 'number')
-          .filter(p => inView(p.latitude, p.longitude))
+          .filter(p => inRegion(p.latitude, p.longitude))
           .map(p => ({
             callsign: p.callsign,
             lat: p.latitude,
@@ -725,6 +727,14 @@ function App() {
       clearInterval(interval);
     };
   }, []);
+
+  useEffect(() => {
+    if (radarPaused) return;
+    const cycle = setInterval(() => {
+      setRadarView(v => (v + 1) % RADAR_VIEWS.length);
+    }, 6500);
+    return () => clearInterval(cycle);
+  }, [radarPaused, radarView]);
 
   useEffect(() => {
     if (!isRosterPage) return;
@@ -982,9 +992,30 @@ function App() {
             initial={{ opacity: 0, scale: 0.96 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 1.1, ease: 'easeOut', delay: 0.15 }}
+            onMouseEnter={() => setRadarPaused(true)}
+            onMouseLeave={() => setRadarPaused(false)}
           >
-            <SectorMap aircraft={aircraft} />
-            <div className="radar-caption">EMIRATES FIR · OMAE · LIVE TRAFFIC</div>
+            <div className="radar-tabs" role="tablist" aria-label="Radar coverage">
+              {RADAR_VIEWS.map((v, i) => (
+                <button
+                  key={v.id}
+                  type="button"
+                  role="tab"
+                  aria-selected={i === radarView}
+                  className={`radar-tab${i === radarView ? ' is-active' : ''}`}
+                  onClick={() => setRadarView(i)}
+                >
+                  {v.label}
+                  {i === radarView && !radarPaused && (
+                    <span key={`p-${radarView}`} className="radar-tab-progress" aria-hidden="true" />
+                  )}
+                </button>
+              ))}
+            </div>
+            <div className="sectormap-stage">
+              <SectorMap aircraft={aircraft} view={RADAR_VIEWS[radarView]} />
+            </div>
+            <div className="radar-caption">{RADAR_VIEWS[radarView].caption}</div>
           </Motion.div>
         </div>
       </section>

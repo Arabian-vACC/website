@@ -22,4 +22,10 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
-"website/" 
+"website/"
+
+# EuroScope sector-file install packages (source for src/*.json, not shipped)
+OMAE */
+OOMM */
+*.sct
+*.ese
